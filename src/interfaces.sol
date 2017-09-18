@@ -18,14 +18,15 @@ interface Pricing {
 }
 
 interface Scoring {
-	function getScore(address ambassador) returns (uint score);
-	function scoreDown(address ambassador) returns (bool res);
-	function scoreUp(address ambassador) returns (bool res);
+	function setScore(address user, uint score);
+	function getScore(address user) returns (uint score);
+	function scoreDown(address user) returns (bool res);
+	function scoreUp(address user) returns (bool res);
 }
 
 interface UserInfo {
-	function getInfo(address user, string info) returns (uint value);
 	function setInfo(address user, string info, uint value);
-	function getInfoString(address user, string info) returns (string value);
+	function getInfo(address user, string info) returns (uint value);
 	function setInfoString(address user, string info, string value);
+	function getInfoString(address user, string info) returns (string value);
 }
