@@ -13,6 +13,19 @@ interface ShareAllocation {
 }
 
 interface Pricing {
-	function priceShare(uint shareType) returns (uint256 tokens);
-	function priceIntro(address ambassador) returns (uint256 tokens);
+	function priceShare(uint shareType, uint amount) returns (uint tokens);
+	function priceIntro(address ambassador) returns (uint tokens);
+}
+
+interface Scoring {
+	function getScore(address ambassador) returns (uint score);
+	function scoreDown(address ambassador) returns (bool res);
+	function scoreUp(address ambassador) returns (bool res);
+}
+
+interface UserInfo {
+	function getInfo(address user, string info) returns (uint value);
+	function setInfo(address user, string info, uint value);
+	function getInfoString(address user, string info) returns (string value);
+	function setInfoString(address user, string info, string value);
 }
