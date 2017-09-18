@@ -1,18 +1,18 @@
 pragma solidity ^0.4.15;
 
 interface Mediator {
-	function initiate(address vendor);
-	function confirm(address ambassador);
-	function endorse(address ambassador);
-	function disendorse(address ambassador);
+	function initiate(address vendor) returns (bool res);
+	function confirm(address ambassador) returns (bool res);
+	function endorse(address ambassador) returns (bool res);
+	function disendorse(address ambassador) returns (bool res);
 }
 
 interface ShareAllocation {
-	function allocate(address vendor, address ambassador, uint shares);
-	function allocate(uint totalShares, uint type);
+	function allocate(address vendor, address ambassador, uint shares) returns (bool res);
+	function allocate(uint totalShares, uint shareType) returns (bool res);
 }
 
 interface Pricing {
-	function priceShare(uint type);
-	function priceIntro(address ambassador);
+	function priceShare(uint shareType) returns (uint256 tokens);
+	function priceIntro(address ambassador) returns (uint256 tokens);
 }

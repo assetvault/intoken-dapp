@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.16;
 
 import "ds-token/token.sol";
 import "ds-stop/stop.sol";
@@ -21,7 +21,7 @@ contract TrustProxy is DSStop {
 		_token = DSToken(token);
 	}
 
-	function getToken() stopable returns (DSToken) {
+	function getToken() stoppable returns (DSToken) {
 		return _token;
 	}
 
@@ -29,7 +29,7 @@ contract TrustProxy is DSStop {
 		_pricing = Pricing(pricing);
 	}
 
-	function getPricing() stopable returns (Pricing) {
+	function getPricing() stoppable returns (Pricing) {
 		return _pricing;
 	}
 
@@ -37,15 +37,15 @@ contract TrustProxy is DSStop {
 		_mediator = Mediator(mediator);
 	}
 
-	function getMediator() stopable returns (Mediator) {
+	function getMediator() stoppable returns (Mediator) {
 		return _mediator;
 	}
 
 	function setShareAllocation(address shareAllocation) auth {
-		_shareAllocation = Mediator(shareAllocation);
+		_shareAllocation = ShareAllocation(shareAllocation);
 	}
 
-	function getShareAllocation() stopable returns (ShareAllocation) {
+	function getShareAllocation() stoppable returns (ShareAllocation) {
 		return _shareAllocation;
 	}
 }
