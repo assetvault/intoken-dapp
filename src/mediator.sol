@@ -7,10 +7,8 @@ import "./proxy.sol";
 contract TrustMediator is Mediator, DSStop {
     enum State {
         Stale,
-        Initiated, 
-        Confirmed, 
-        Endorsed,
-        Disendorsed
+        Initiated,
+        Confirmed
     }
 
     TrustProxy                                         _proxy;
@@ -27,10 +25,10 @@ contract TrustMediator is Mediator, DSStop {
         _;
     }
 
-    event IntroductionInitiated(address vendor, address ambassador);
-    event IntroductionConfirmed(address vendor, address ambassador);
-    event IntroductionEndorsed(address vendor, address ambassador);
-    event IntroductionDisendorsed(address vendor, address ambassador);
+    event Initiated(address indexed vendor, address indexed ambassador);
+    event Confirmed(address indexed vendor, address indexed ambassador);
+    event Endorsed(address indexed vendor, address indexed ambassador);
+    event Disendorsed(address indexed vendor, address indexed ambassador);
 
     function setProxy(address proxy) auth {
         _proxy = TrustProxy(proxy);
@@ -41,47 +39,50 @@ contract TrustMediator is Mediator, DSStop {
         
         _transitions[vendor][msg.sender] = State.Initiated;
         
-        IntroductionInitiated(vendor, msg.sender);
+        Initiated(vendor, msg.sender);
 
         return true;
     }
 
     function confirm(address ambassador) stoppable proxyExists returns (bool res) {
         require(State.Initiated == _transitions[msg.sender][ambassador]);
-        require(_proxy.getToken().balanceOf(msg.sender) >= _proxy.getPricing().priceIntro(ambassador));
 
         uint256 deposit = _proxy.getPricing().priceIntro(ambassador);
+        require(_proxy.getToken().balanceOf(msg.sender) >= deposit);
+
         _transitions[msg.sender][ambassador] = State.Confirmed;
         _deposits[msg.sender][ambassador] = deposit;
         res = _proxy.getToken().approve(msg.sender, deposit);
         res = _proxy.getToken().transfer(this, deposit);
 
-        IntroductionConfirmed(msg.sender, ambassador);
+        Confirmed(msg.sender, ambassador);
     }
 
     function endorse(address ambassador) stoppable proxyExists returns (bool res) {
         require(State.Confirmed == _transitions[msg.sender][ambassador]);
-        require(_deposits[msg.sender][ambassador] > 0);
-
+        
         uint256 deposit = _deposits[msg.sender][ambassador];
+        require(deposit > 0);
+
         _deposits[msg.sender][ambassador] = 0;
-        _transitions[msg.sender][ambassador] = State.Endorsed;
+        _transitions[msg.sender][ambassador] = State.Stale;
         res = _proxy.getToken().transferFrom(this, ambassador, deposit);
         res = _proxy.getShareAllocation().allocate(msg.sender, ambassador, 1);
 
-        IntroductionEndorsed(msg.sender, ambassador);
+        Endorsed(msg.sender, ambassador);
     }
 
     function disendorse(address ambassador) stoppable proxyExists returns (bool res) {
         require(State.Confirmed == _transitions[msg.sender][ambassador]);
-        require(_deposits[msg.sender][ambassador] > 0);
 
         uint256 deposit = _deposits[msg.sender][ambassador];
+        require(deposit > 0);
+        
         _deposits[msg.sender][ambassador] = 0;
-        _transitions[msg.sender][ambassador] = State.Disendorsed;
+        _transitions[msg.sender][ambassador] = State.Stale;
         res = _proxy.getToken().transferFrom(this, msg.sender, deposit);
 
-        IntroductionDisendorsed(msg.sender, ambassador);
+        Disendorsed(msg.sender, ambassador);
     }
 
 }

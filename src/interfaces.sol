@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.16;
 
 interface Mediator {
 	function initiate(address vendor) returns (bool res);
