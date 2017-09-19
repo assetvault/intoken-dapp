@@ -8,7 +8,9 @@ contract TrustMediator is Mediator, DSStop {
     enum State {
         Stale,
         Initiated,
-        Confirmed
+        Confirmed,
+        Endorsed,
+        Disendorsed
     }
 
     TrustProxy                                      _proxy;
@@ -22,6 +24,7 @@ contract TrustMediator is Mediator, DSStop {
 
     event Initiated(address indexed vendor, address indexed ambassador, bool success);
     event Confirmed(address indexed vendor, address indexed ambassador, bool success);
+    event Resolved(address indexed vendor, address indexed ambassador, bool success);
     event Endorsed(address indexed vendor, address indexed ambassador, bool success);
     event Disendorsed(address indexed vendor, address indexed ambassador, bool success);
 
@@ -39,7 +42,12 @@ contract TrustMediator is Mediator, DSStop {
         return true;
     }
 
-    function confirm(address ambassador) stoppable note proxyExists returns (bool res) {
+    function confirm(address ambassador) 
+        stoppable 
+        note 
+        proxyExists 
+        returns (bool res) 
+    {
         require(State.Initiated == _transitions[msg.sender][ambassador]);
 
         uint deposit = _proxy.getPricing().priceIntro(ambassador);
@@ -48,41 +56,58 @@ contract TrustMediator is Mediator, DSStop {
         _transitions[msg.sender][ambassador] = State.Confirmed;
         _deposits[msg.sender][ambassador] = deposit;
 
-        res = _proxy.getToken().approve(msg.sender, deposit);
-        res = res && _proxy.getToken().transfer(this, deposit);
+        res = _proxy.getToken().transfer(this, deposit);
 
         Confirmed(msg.sender, ambassador, res);
     }
 
-    function endorse(address ambassador) stoppable note proxyExists returns (bool res) {
+    function endorse(address ambassador) stoppable note returns (bool res) {
         require(State.Confirmed == _transitions[msg.sender][ambassador]);
         
-        uint deposit = _deposits[msg.sender][ambassador];
-        require(deposit > 0);
+        _transitions[msg.sender][ambassador] = State.Endorsed;
 
-        _deposits[msg.sender][ambassador] = 0;
-        _transitions[msg.sender][ambassador] = State.Stale;
+        Endorsed(msg.sender, ambassador, true);
 
-        res = _proxy.getScoring().scoreUp(ambassador);
-        res = res && _proxy.getShareAllocation().allocate(msg.sender, ambassador, 1);
-        res = res && _proxy.getToken().transferFrom(this, ambassador, deposit);
-
-        Endorsed(msg.sender, ambassador, res);
+        return true;
     }
 
-    function disendorse(address ambassador) stoppable note proxyExists returns (bool res) {
+    function disendorse(address ambassador) stoppable note returns (bool res) {
         require(State.Confirmed == _transitions[msg.sender][ambassador]);
 
-        uint deposit = _deposits[msg.sender][ambassador];
+        _transitions[msg.sender][ambassador] = State.Disendorsed;
+
+        Disendorsed(msg.sender, ambassador, true);
+
+        return true;
+    }
+
+    function resolve(address vendor, address ambassador) 
+        auth 
+        stoppable 
+        note 
+        proxyExists 
+        returns (bool res) 
+    {
+        require(State.Endorsed == _transitions[vendor][ambassador]
+             || State.Disendorsed == _transitions[vendor][ambassador]);
+
+        uint deposit = _deposits[vendor][ambassador];
         require(deposit > 0);
         
-        _deposits[msg.sender][ambassador] = 0;
-        _transitions[msg.sender][ambassador] = State.Stale;
-        
-        res = _proxy.getScoring().scoreDown(ambassador);
-        res = res && _proxy.getToken().transferFrom(this, msg.sender, deposit);
+        _deposits[vendor][ambassador] = 0;
+        _transitions[vendor][ambassador] = State.Stale;
 
-        Disendorsed(msg.sender, ambassador, res);
-    }
+        if (State.Endorsed == _transitions[vendor][ambassador]) {
+            res = _proxy.getShareManager().allocate(vendor, ambassador, 1);
+            res = res && _proxy.getScoring().scoreUp(ambassador);
+            res = res && _proxy.getToken().approve(ambassador, deposit);
+        }
+        if (State.Disendorsed == _transitions[vendor][ambassador]) {
+            res = _proxy.getScoring().scoreDown(ambassador);
+            res = res && _proxy.getToken().approve(vendor, deposit);
+        }
+
+        Resolved(vendor, ambassador, res);
+    } 
 
 }

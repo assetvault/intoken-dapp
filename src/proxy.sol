@@ -10,7 +10,7 @@ contract TrustProxy is DSStop {
 	Scoring 			_scoring;
 	UserInfo 			_userInfo;
 	Mediator 			_mediator;
-	ShareAllocation		_shareAllocation;
+	ShareManager		_shareManager;
 
 	function TrustProxy(
 		address token, 
@@ -18,17 +18,17 @@ contract TrustProxy is DSStop {
 		address scoring, 
 		address userInfo, 
 		address mediator, 
-		address shareAllocation
+		address shareManager
 	) {
 		_token = DSToken(token);
 		_pricing = Pricing(pricing);
 		_scoring = Scoring(scoring);
 		_userInfo = UserInfo(userInfo);
 		_mediator = Mediator(mediator);
-		_shareAllocation = ShareAllocation(shareAllocation);
+		_shareManager = ShareManager(shareManager);
 	}
 
-	function setToken(address token) auth {
+	function setToken(address token) auth note {
 		_token = DSToken(token);
 	}
 
@@ -36,7 +36,7 @@ contract TrustProxy is DSStop {
 		return _token;
 	}
 
-	function setPricing(address pricing) auth {
+	function setPricing(address pricing) auth note {
 		_pricing = Pricing(pricing);
 	}
 
@@ -44,7 +44,7 @@ contract TrustProxy is DSStop {
 		return _pricing;
 	}
 
-	function setScoring(address scoring) auth {
+	function setScoring(address scoring) auth note {
 		_scoring = Scoring(scoring);
 	}
 
@@ -52,7 +52,7 @@ contract TrustProxy is DSStop {
 		return _scoring;
 	}
 
-	function setUserInfo(address userInfo) auth {
+	function setUserInfo(address userInfo) auth note {
 		_userInfo = UserInfo(userInfo);
 	}
 
@@ -60,7 +60,7 @@ contract TrustProxy is DSStop {
 		return _userInfo;
 	}
 
-	function setMediator(address mediator) auth {
+	function setMediator(address mediator) auth note {
 		_mediator = Mediator(mediator);
 	}
 
@@ -68,11 +68,11 @@ contract TrustProxy is DSStop {
 		return _mediator;
 	}
 
-	function setShareAllocation(address shareAllocation) auth {
-		_shareAllocation = ShareAllocation(shareAllocation);
+	function setShareManager(address shareManager) auth note {
+		_shareManager = ShareManager(shareManager);
 	}
 
-	function getShareAllocation() stoppable returns (ShareAllocation) {
-		return _shareAllocation;
+	function getShareManager() stoppable returns (ShareManager) {
+		return _shareManager;
 	}
 }

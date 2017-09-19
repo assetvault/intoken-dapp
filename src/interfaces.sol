@@ -5,15 +5,16 @@ interface Mediator {
 	function confirm(address ambassador) returns (bool res);
 	function endorse(address ambassador) returns (bool res);
 	function disendorse(address ambassador) returns (bool res);
+	function resolve(address vendor, address ambassador) returns (bool res);
 }
 
-interface ShareAllocation {
+interface ShareManager {
 	function allocate(address vendor, address ambassador, uint shares) returns (bool res);
-	function allocate(uint totalShares, uint shareType) returns (bool res);
+	function distribute(address vendor, uint8 shareType, uint amount) returns (bool res);
 }
 
 interface Pricing {
-	function priceShare(uint shareType, uint amount) returns (uint tokens);
+	function priceShare(uint8 shareType, uint amount) returns (uint tokens);
 	function priceIntro(address ambassador) returns (uint tokens);
 }
 

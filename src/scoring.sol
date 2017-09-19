@@ -16,24 +16,23 @@ contract TrustScoring is Scoring, DSStop, DSMath {
 		return _scores[user];
 	}
 
-	function setScore(address user, uint score) auth note {
+	function setScore(address user, uint score) auth stoppable note {
 		_scores[user] = score;	
 	}
 
-	function setScoreIncrement(uint scoreIncrement) auth note {
+	function setScoreIncrement(uint scoreIncrement) auth stoppable note {
 		_scoreIncrement = scoreIncrement;
 	}
 
-	function scoreDown(address user) returns (bool res) {
-		_scores[user] = min(0, sub(_scores[user], _scoreIncrement));
+	function scoreDown(address user) auth stoppable note returns (bool res) {
+		_scores[user] = max(0, sub(_scores[user], _scoreIncrement));
 
 		return true;
 	}
 
-	function scoreUp(address user) returns (bool res) {
+	function scoreUp(address user) auth stoppable note returns (bool res) {
 		_scores[user] = min(200, add(_scores[user], _scoreIncrement));
 
 		return true;
 	}
-
 }

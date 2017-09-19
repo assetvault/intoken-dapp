@@ -11,7 +11,7 @@ contract InbotUserInfo is UserInfo, DSStop {
 		return _int_info[user][info];
 	}
 
-	function setInfo(address user, string info, uint value) auth note {
+	function setInfo(address user, string info, uint value) auth stoppable note {
 		_int_info[user][info] = value;	
 	}
 
@@ -19,8 +19,7 @@ contract InbotUserInfo is UserInfo, DSStop {
 		return _str_info[user][info];
 	}
 
-	function setInfoString(address user, string info, string value) auth note {
+	function setInfoString(address user, string info, string value) auth stoppable note {
 		_str_info[user][info] = value;
 	}
-
 }
