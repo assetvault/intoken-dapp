@@ -100,6 +100,6 @@ contract TrustPricing is Pricing, DSStop, DSMath {
     	uint8 corpSize = uint8(_proxy.getUserInfo().getInfo(ambassador, "corp_size"));
     	uint8 corpPosition = uint8(_proxy.getUserInfo().getInfo(ambassador, "corp_position"));
 
-    	require((tokens =_introPricing[corpSize][corpPosition]*_proxy.getScoring().getScore(ambassador)) > 0);
+    	require((tokens = mul(_introPricing[corpSize][corpPosition], _proxy.getScoring().getScore(ambassador))) > 0);
     }
 }

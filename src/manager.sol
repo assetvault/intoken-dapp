@@ -7,6 +7,7 @@ import "./proxy.sol";
 
 contract TrustShareManager is ShareManager, DSStop, DSMath {
 	TrustProxy                    			   	   _proxy;
+	mapping (address => uint)				   	   _escrows;
 	mapping (address => address[])				   _keys;
 	mapping (address => mapping (address => uint)) _shares;
 
@@ -15,14 +16,15 @@ contract TrustShareManager is ShareManager, DSStop, DSMath {
         _;
     }
 
-    event Allocated(address indexed vendor, address indexed ambassador, uint shares, bool success);
-    event Distributed(address indexed vendor, uint totalShares, uint sharePrice, bool success);
+    event IncomeAllocated(address indexed vendor, uint totalTokens, bool success);
+    event SharesAllocated(address indexed vendor, address indexed ambassador, uint shares, bool success);
+    event SharesDistributed(address indexed vendor, uint totalShares, uint sharePrice, bool success);
 
     function setProxy(address proxy) auth note {
         _proxy = TrustProxy(proxy);
     }
 
-	function allocate(address vendor, address ambassador, uint shares) 
+	function allocate(address vendor, address ambassador, uint shares)
 		auth 
 		stoppable
 		note
@@ -31,12 +33,12 @@ contract TrustShareManager is ShareManager, DSStop, DSMath {
 		_shares[vendor][ambassador] = shares;
 		_keys[vendor].push(ambassador);
 
-		Allocated(vendor, ambassador, shares, true);
+		SharesAllocated(vendor, ambassador, shares, true);
 
 		return true;
 	}
 
-	function distribute(address vendor, uint8 shareType, uint amount) 
+	function allocate(address vendor, uint8 shareType, uint amount)
 		auth 
 		stoppable
 		note
@@ -44,26 +46,50 @@ contract TrustShareManager is ShareManager, DSStop, DSMath {
 		returns (bool res)
 	{
 		uint totalTokens = _proxy.getPricing().priceShare(shareType, amount);
-		require(_proxy.getToken().balanceOf(msg.sender) >= totalTokens);
+
+		DSToken token = _proxy.getToken(); 
+		token.mint(uint128(totalTokens));
+
+		_escrows[vendor] = add(_escrows[vendor], div(totalTokens, 4));
+
+		res = token.transfer(token.owner(), div(totalTokens, 4));
+		res = res && token.approve(vendor, div(totalTokens, 2));
+
+		IncomeAllocated(vendor, totalTokens, res);
+	}
+
+	function distribute(address vendor, uint8 shareType, uint amount)
+		auth 
+		stoppable
+		note
+		proxyExists
+		returns (bool res)
+	{
+		DSToken token = _proxy.getToken(); 
+		// figuring out the share pricing and performing trusted mint op
+		uint totalTokens = _proxy.getPricing().priceShare(shareType, amount);
+		token.mint(uint128(totalTokens));
+		// adding a total amount of accumulated escrows
+		totalTokens = totalTokens + _escrows[vendor];
 
 		uint totalShares = 0;
+		uint ambassadorShares = 0;
 		address ambassador = address(0x0);
 
 		for(uint i = 1; i<_keys[vendor].length; i++) {
 			ambassador = _keys[vendor][i];
-			totalShares = add(totalShares, _shares[vendor][ambassador]);
+			ambassadorShares = _shares[vendor][ambassador];
+			totalShares = add(totalShares, ambassadorShares);
 		}
 
-		res = true; uint shares = 0;
-		uint sharePrice = div(totalTokens, totalShares);
+		res = true; uint sharePrice = div(totalTokens, totalShares);
 
 		for(i = 1; i<_keys[vendor].length; i++) {
 			ambassador = _keys[vendor][i];
-			shares = _shares[vendor][ambassador];
-
-			res = res && _proxy.getToken().approve(ambassador, mul(sharePrice, shares));
+			ambassadorShares = _shares[vendor][ambassador];
+			res = res && token.approve(ambassador, mul(sharePrice, ambassadorShares));
 		}
 
-		Distributed(vendor, totalShares, sharePrice, res);
+		SharesDistributed(vendor, totalShares, sharePrice, res);
 	}
 }
