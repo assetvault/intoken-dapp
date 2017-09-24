@@ -42,7 +42,7 @@ contract TrustMediator is Mediator, DSStop {
         return true;
     }
 
-    function confirm(address ambassador) 
+    function confirm(address ambassador)
         stoppable 
         note 
         proxyExists 
@@ -52,11 +52,12 @@ contract TrustMediator is Mediator, DSStop {
 
         uint deposit = _proxy.getPricing().priceIntro(ambassador);
         require(_proxy.getToken().balanceOf(msg.sender) >= deposit);
+        require(_proxy.getToken().allowance(msg.sender, this) >= deposit);
 
         _transitions[msg.sender][ambassador] = State.Confirmed;
         _deposits[msg.sender][ambassador] = deposit;
 
-        res = _proxy.getToken().transfer(this, deposit);
+        res = _proxy.getToken().pull(msg.sender, deposit);
 
         Confirmed(msg.sender, ambassador, res);
     }
