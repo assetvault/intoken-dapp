@@ -1,14 +1,15 @@
 pragma solidity ^0.4.16;
 
 import "ds-test/test.sol";
-import "ds-guard/guard.sol";
 import "./interfaces.sol";
 import "./mediator.sol";
 import "./manager.sol";
 import "./pricing.sol";
 import "./scoring.sol";
 import "./token.sol";
+import "./guard.sol";
 import "./proxy.sol";
+import "./info.sol";
 
 contract TokenUser {
     DSToken  token;
@@ -52,8 +53,10 @@ contract TokenUser {
 }
 
 contract EcosystemTest is DSTest {
-	DSGuard guard;
-	TrustPoxy proxy;
+    address user1;
+    address user2;
+    TrustProxy proxy;
+	TrustGuard guard;
 	TrustToken token;
 	InbotUserInfo info;
 	TrustScoring scoring;
@@ -62,18 +65,18 @@ contract EcosystemTest is DSTest {
 	TrustShareManager manager;
 
 	function setUp() {
-		guard = new DSGuard();
+		guard = new TrustGuard();
 		token = new TrustToken();
 		user1 = new TokenUser(token);
         user2 = new TokenUser(token);
 
 		info = new InbotUserInfo();
-		pricing = new TrustPricing();
+		pricing = new TrustPricing(10);
 		scoring = new TrustScoring();
 		mediator = new TrustMediator();
 		manager = new TrustShareManager();
 
-		proxy = TrustPoxy(token, pricing, scoring, info, mediator, manager);
+		proxy = new TrustProxy(token, pricing, scoring, info, mediator, manager);
 		pricing.setProxy(proxy);
 		manager.setProxy(proxy);
 		mediator.setProxy(proxy);

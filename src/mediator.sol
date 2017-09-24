@@ -57,7 +57,7 @@ contract TrustMediator is Mediator, DSStop {
         _transitions[msg.sender][ambassador] = State.Confirmed;
         _deposits[msg.sender][ambassador] = deposit;
 
-        res = _proxy.getToken().pull(msg.sender, deposit);
+        res = _proxy.getToken().transferFrom(msg.sender, this, deposit);
 
         Confirmed(msg.sender, ambassador, res);
     }
