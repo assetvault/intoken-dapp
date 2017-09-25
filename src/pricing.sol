@@ -32,13 +32,15 @@ contract TrustPricing is Pricing, DSStop, DSMath {
 	}
 
     TrustProxy                    			   _proxy;
-	uint								   	   _tokenPrice;
+    uint                                       _tokenPrice;
+	uint								   	   _introPriceMultiplier;
     mapping (uint8 => uint)  				   _sharePricing;
     mapping (uint8 => mapping (uint8 => uint)) _introPricing;
 
     function TrustPricing(uint8 tokenPrice) {
-    	_tokenPrice = tokenPrice;
-    	// setting pricing per share typr
+        _tokenPrice = tokenPrice;
+        _introPriceMultiplier = 1;
+    	// setting pricing in % per share type
     	_sharePricing[uint8(ShareType.Fiat)] = 95;
     	_sharePricing[uint8(ShareType.MajorStocks)] = 90;
     	_sharePricing[uint8(ShareType.BTC)] = 85;
@@ -46,27 +48,27 @@ contract TrustPricing is Pricing, DSStop, DSMath {
     	_sharePricing[uint8(ShareType.MinorStocks)] = 75;
     	_sharePricing[uint8(ShareType.Crypto)] = 70;
     	_sharePricing[uint8(ShareType.StartupStocks)] = 50;
-    	//setting pricing per intro configuration
-    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.ANY)] = 40;
-    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.Manager)] = 40;
-    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.Director)] = 60;
-    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.VicePresident)] = 80;
-    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.CXO)] = 100;
-    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.ANY)] = 40;
-    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.Manager)] = 40;
-    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.Director)] = 60;
-    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.VicePresident)] = 80;
-    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.CXO)] = 100;
-    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.ANY)] = 80;
-    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.Manager)] = 80;
-    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.Director)] = 120;
-    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.VicePresident)] = 160;
-    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.CXO)] = 200;
-    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.ANY)] = 160;
-    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.Manager)] = 160;
-    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.Director)] = 240;
-    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.VicePresident)] = 320;
-    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.CXO)] = 400;
+    	//setting pricing per intro configuration in Trust Tokens
+    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.ANY)] = 4;
+    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.Manager)] = 4;
+    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.Director)] = 6;
+    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.VicePresident)] = 8;
+    	_introPricing[uint8(CorpSize.ANY)][uint8(CorpPosition.CXO)] = 10;
+    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.ANY)] = 4;
+    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.Manager)] = 4;
+    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.Director)] = 6;
+    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.VicePresident)] = 8;
+    	_introPricing[uint8(CorpSize.Small)][uint8(CorpPosition.CXO)] = 10;
+    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.ANY)] = 8;
+    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.Manager)] = 8;
+    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.Director)] = 12;
+    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.VicePresident)] = 16;
+    	_introPricing[uint8(CorpSize.Medium)][uint8(CorpPosition.CXO)] = 20;
+    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.ANY)] = 16;
+    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.Manager)] = 16;
+    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.Director)] = 24;
+    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.VicePresident)] = 32;
+    	_introPricing[uint8(CorpSize.Large)][uint8(CorpPosition.CXO)] = 40;
     }
 
     modifier proxyExists() {
@@ -78,12 +80,28 @@ contract TrustPricing is Pricing, DSStop, DSMath {
         _proxy = TrustProxy(proxy);
     }
 
+    function setIntroPriceMultiplier(uint multiplier) auth note {
+        _introPriceMultiplier = multiplier;
+    }
+
+    function getTokenPrice() stoppable constant returns (uint price) {
+        return _tokenPrice;
+    }
+
     function setTokenPrice(uint tokenPrice) auth stoppable note {
         _tokenPrice = tokenPrice;
     }
 
+    function getSharePricing(uint8 shareType) stoppable constant returns (uint pricing) {
+        return _sharePricing[shareType];
+    }
+
     function setSharePricing(uint8 shareType, uint pricing) auth stoppable note {
         _sharePricing[shareType] = pricing;
+    }
+
+    function getIntroPricing(uint8 corpSize, uint8 corpPosition) stoppable constant returns (uint pricing) {
+        return _introPricing[corpSize][corpPosition];
     }
 
     function setIntroPricing(uint8 corpSize, uint8 corpPosition, uint pricing) auth stoppable note {
@@ -100,6 +118,9 @@ contract TrustPricing is Pricing, DSStop, DSMath {
     	uint8 corpSize = uint8(_proxy.getUserInfo().getInfo(ambassador, "corp_size"));
     	uint8 corpPosition = uint8(_proxy.getUserInfo().getInfo(ambassador, "corp_position"));
 
-    	require((tokens = mul(_introPricing[corpSize][corpPosition], _proxy.getScoring().getScore(ambassador))) > 0);
+        uint score = _proxy.getScoring().getScore(ambassador);
+        uint price = mul(_introPricing[corpSize][corpPosition], _introPriceMultiplier);
+
+    	require((tokens = div(mul(price, score), 100)) > 0);
     }
 }

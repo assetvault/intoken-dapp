@@ -7,7 +7,7 @@ contract InbotUserInfo is UserInfo, DSStop {
 	mapping (address => mapping (string => uint)) 	_int_info;
 	mapping (address => mapping (string => string)) _str_info;
 
-	function getInfo(address user, string info) stoppable returns (uint value) {
+	function getInfo(address user, string info) stoppable constant returns (uint value) {
 		return _int_info[user][info];
 	}
 
@@ -15,7 +15,7 @@ contract InbotUserInfo is UserInfo, DSStop {
 		_int_info[user][info] = value;	
 	}
 
-	function getInfoString(address user, string info) stoppable returns (string value) {
+	function getInfoString(address user, string info) stoppable constant returns (string value) {
 		return _str_info[user][info];
 	}
 

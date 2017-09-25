@@ -6,17 +6,22 @@ import "./interfaces.sol";
 
 contract TrustScoring is Scoring, DSStop, DSMath {
 	mapping (address => uint) _scores;
+	mapping (address => bool) _initialized;
 	uint					  _scoreIncrement;
+	uint					  _defaultScore;
 
 	function TrustScoring() {
+		// setting scoring increment/default in %
 		_scoreIncrement = 10;
+		_defaultScore = 50;
 	}
 
-	function getScore(address user) stoppable returns (uint score) {
-		return _scores[user];
+	function getScore(address user) stoppable constant returns (uint score) {
+		return _initialized[user] ? _scores[user] : _defaultScore;
 	}
 
 	function setScore(address user, uint score) auth stoppable note {
+		_initialized[user] = true;	
 		_scores[user] = score;	
 	}
 
@@ -24,14 +29,18 @@ contract TrustScoring is Scoring, DSStop, DSMath {
 		_scoreIncrement = scoreIncrement;
 	}
 
+	function setDefaultScore(uint defaultScore) auth stoppable note {
+		_defaultScore = defaultScore;
+	}
+
 	function scoreDown(address user) auth stoppable note returns (bool res) {
-		_scores[user] = max(0, sub(_scores[user], _scoreIncrement));
+		setScore(user, max(0, sub(getScore(user), _scoreIncrement)));
 
 		return true;
 	}
 
 	function scoreUp(address user) auth stoppable note returns (bool res) {
-		_scores[user] = min(200, add(_scores[user], _scoreIncrement));
+		setScore(user, min(200, add(getScore(user), _scoreIncrement)));
 
 		return true;
 	}

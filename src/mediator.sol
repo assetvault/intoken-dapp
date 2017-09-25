@@ -4,7 +4,15 @@ import "ds-stop/stop.sol";
 import "./interfaces.sol";
 import "./proxy.sol";
 
-contract TrustMediator is Mediator, DSStop {
+contract TrustMediatorEvents {
+    event Initiated(address indexed vendor, address indexed ambassador, bool success);
+    event Confirmed(address indexed vendor, address indexed ambassador, bool success);
+    event Resolved(address indexed vendor, address indexed ambassador, bool success);
+    event Endorsed(address indexed vendor, address indexed ambassador, bool success);
+    event Disendorsed(address indexed vendor, address indexed ambassador, bool success);
+} 
+
+contract TrustMediator is Mediator, TrustMediatorEvents, DSStop {
     enum State {
         Stale,
         Initiated,
@@ -22,15 +30,25 @@ contract TrustMediator is Mediator, DSStop {
         _;
     }
 
-    event Initiated(address indexed vendor, address indexed ambassador, bool success);
-    event Confirmed(address indexed vendor, address indexed ambassador, bool success);
-    event Resolved(address indexed vendor, address indexed ambassador, bool success);
-    event Endorsed(address indexed vendor, address indexed ambassador, bool success);
-    event Disendorsed(address indexed vendor, address indexed ambassador, bool success);
-
     function setProxy(address proxy) auth note {
         _proxy = TrustProxy(proxy);
     }
+
+    function getDeposit(address vendor, address ambassador)
+        stoppable 
+        constant 
+        returns (uint deposit) 
+    {
+        return _deposits[vendor][ambassador];
+    }
+
+    function getTransitionState(address vendor, address ambassador)
+        stoppable 
+        constant 
+        returns (uint8 state) 
+    {
+        return uint8(_transitions[vendor][ambassador]);
+    } 
 
     function initiate(address vendor) stoppable note returns (bool) {
         require(State.Stale == _transitions[vendor][msg.sender]);
@@ -92,18 +110,19 @@ contract TrustMediator is Mediator, DSStop {
         require(State.Endorsed == _transitions[vendor][ambassador]
              || State.Disendorsed == _transitions[vendor][ambassador]);
 
+        State state = _transitions[vendor][ambassador];
         uint deposit = _deposits[vendor][ambassador];
         require(deposit > 0);
         
         _deposits[vendor][ambassador] = 0;
         _transitions[vendor][ambassador] = State.Stale;
 
-        if (State.Endorsed == _transitions[vendor][ambassador]) {
+        if (State.Endorsed == state) {
             res = _proxy.getShareManager().allocate(vendor, ambassador, 1);
             res = res && _proxy.getScoring().scoreUp(ambassador);
             res = res && _proxy.getToken().approve(ambassador, deposit);
         }
-        if (State.Disendorsed == _transitions[vendor][ambassador]) {
+        if (State.Disendorsed == state) {
             res = _proxy.getScoring().scoreDown(ambassador);
             res = res && _proxy.getToken().approve(vendor, deposit);
         }
