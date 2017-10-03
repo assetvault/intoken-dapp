@@ -68,13 +68,10 @@ contract TrustShareManager is ShareManager, TrustShareManagerEvents, DSStop, DSM
 		DSToken token = _proxy.getToken(); 
 		token.mint(uint128(totalTokens));
 
-		uint oneFourth = div(totalTokens, 4);
-		uint oneHalf = sub(totalTokens, mul(oneFourth, 2));
+		uint oneHalf = div(totalTokens, 2);
 
-		_escrows[vendor] = add(_escrows[vendor], oneFourth);
-
-		res = token.transfer(token.owner(), oneFourth);
-		res = res && token.approve(vendor, oneHalf);
+		_escrows[vendor] = add(_escrows[vendor], sub(totalTokens, oneHalf));
+		res = token.transfer(token.owner(), oneHalf);
 
 		IncomeEscrowed(vendor, totalTokens, res);
 	}

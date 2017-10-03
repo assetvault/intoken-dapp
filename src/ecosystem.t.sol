@@ -61,7 +61,7 @@ contract EcosystemUser {
     }
 }
 
-contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
+contract EcosystemTest is DSTest, DSMath, TrustMediatorEvents, TrustShareManagerEvents {
     EcosystemUser user1;
     EcosystemUser user2;
     TrustProxy proxy;
@@ -78,7 +78,7 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
 		token = new TrustToken();
 
 		info = new InbotUserInfo();
-		pricing = new TrustPricing(10);
+		pricing = new TrustPricing();
 		scoring = new TrustScoring();
 		mediator = new TrustMediator();
 		manager = new TrustShareManager();
@@ -91,6 +91,7 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
         guard.permit(mediator, scoring, guard.ANY());
         guard.permit(mediator, manager, guard.ANY());
         guard.permit(pricing, scoring, guard.ANY());
+        guard.permit(mediator, token, guard.ANY());
         guard.permit(manager, token, guard.ANY());
         scoring.setAuthority(guard);
         manager.setAuthority(guard);
@@ -131,20 +132,7 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
         user2.doConfirmIntro(user1);
     }
 
-    function testFailConfirmIntroNoDeposit() logs_gas {
-        expectEventsExact(mediator);
-
-        Initiated(user2, user1, true);
-
-        user1.doInitiateIntro(user2);
-        user2.doConfirmIntro(user1);
-    }
-
     function testConfirmIntro() logs_gas {
-        token.mint(100);
-        token.transfer(user2, 2);
-        user2.doApprove(mediator, 2);
-
         expectEventsExact(mediator);
 
         Initiated(user2, user1, true);
@@ -153,10 +141,7 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
         user1.doInitiateIntro(user2);
         user2.doConfirmIntro(user1);
 
-        assertEq(token.balanceOf(user1), 0);
-        assertEq(token.balanceOf(user2), 0);
-        assertEq(token.balanceOf(mediator), 2);
-        assertEq(token.allowance(user2, mediator), 0);
+        assertEq(mediator.getDeposit(user2, user1), 50*WAD);
     }
 
     function testFailEndorseIntro() logs_gas {
@@ -164,10 +149,6 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
     }
 
     function testEndorseIntro() logs_gas {
-        token.mint(100);
-        token.transfer(user2, 2);
-        user2.doApprove(mediator, 2);
-
         expectEventsExact(mediator);
 
         Initiated(user2, user1, true);
@@ -178,10 +159,7 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
         user2.doConfirmIntro(user1);
         user2.doEndorseIntro(user1);
 
-        assertEq(token.balanceOf(user1), 0);
-        assertEq(token.balanceOf(user2), 0);
-        assertEq(token.balanceOf(mediator), 2);
-        assertEq(token.allowance(user2, mediator), 0);
+        assertEq(mediator.getDeposit(user2, user1), 50*WAD);
     }
 
     function testFailDisndorseIntro() logs_gas {
@@ -189,10 +167,6 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
     }
 
     function testDisendorseIntro() logs_gas {
-        token.mint(100);
-        token.transfer(user2, 2);
-        user2.doApprove(mediator, 2);
-
         expectEventsExact(mediator);
 
         Initiated(user2, user1, true);
@@ -203,10 +177,7 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
         user2.doConfirmIntro(user1);
         user2.doDisendorseIntro(user1);
 
-        assertEq(token.balanceOf(user1), 0);
-        assertEq(token.balanceOf(user2), 0);
-        assertEq(token.balanceOf(mediator), 2);
-        assertEq(token.allowance(user2, mediator), 0);
+        assertEq(mediator.getDeposit(user2, user1), 50*WAD);
     }
 
     function testFailResolveIntro() logs_gas {
@@ -214,11 +185,7 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
     }
 
     function testResolveEndorsedIntro() logs_gas {
-        token.mint(100);
-        token.transfer(user2, 8);
-        user2.doApprove(mediator, 8);
         scoring.setScore(user1, 200);
-
         expectEventsExact(mediator);
 
         Initiated(user2, user1, true);
@@ -231,22 +198,13 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
         user2.doEndorseIntro(user1);
         mediator.resolve(user2, user1);
 
-        assertEq(token.balanceOf(user1), 0);
-        assertEq(token.balanceOf(user2), 0);
-        assertEq(token.balanceOf(mediator), 8);
-        assertEq(token.allowance(mediator, user1), 8);
-        assertEq(token.allowance(user2, mediator), 0);
+        assertEq(token.allowance(mediator, user1), 200*WAD);
+        assertEq(mediator.getDeposit(user2, user1), 0);
         assertEq(manager.getShare(user2, user1), 1);
         assertEq(scoring.getScore(user1), 200);
     }
 
     function testResolveDisendorsedIntro() logs_gas {
-        token.mint(100);
-        token.transfer(user2, 6);
-        user2.doApprove(mediator, 6);
-        info.setInfo(user1, "corp_size", 2);
-        info.setInfo(user1, "corp_position", 2);
-
         expectEventsExact(mediator);
 
         Initiated(user2, user1, true);
@@ -259,12 +217,8 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
         user2.doDisendorseIntro(user1);
         mediator.resolve(user2, user1);
 
-        assertEq(token.balanceOf(user1), 0);
-        assertEq(token.balanceOf(user2), 0);
-        assertEq(token.balanceOf(mediator), 6);
-        assertEq(token.allowance(mediator, user2), 6);
-        assertEq(token.allowance(user2, mediator), 0);
-        assertEq(manager.getShare(user2, user1), 0);
+        assertEq(token.allowance(mediator, user1), 0);
+        assertEq(mediator.getDeposit(user2, user1), 0);
         assertEq(scoring.getScore(user1), 40);
     }
 
@@ -285,22 +239,24 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
     function testEscrowIncome() logs_gas {
         expectEventsExact(manager);
 
-        IncomeEscrowed(user1, 95, true);
+        uint amount = 475 * 10**17;
+        IncomeEscrowed(user1, amount, true);
 
         manager.escrow(user1, 0, 1000);
 
-        assertEq(manager.getEscrow(user1), 23);
-        assertEq(token.balanceOf(this), 23);
-        assertEq(token.balanceOf(user1), 0);
-        assertEq(token.balanceOf(manager), 72);
-        assertEq(token.allowance(manager, user1), 49);
+        assertEq(manager.getEscrow(user1), amount);
+        assertEq(token.balanceOf(this), amount);
+        assertEq(token.balanceOf(manager), amount);
     }
 
     function testDistributeShares() logs_gas {
         expectEventsExact(manager);
 
-        IncomeEscrowed(user1, 95, true);
-        SharesDistributed(user1, 1, 118, true);
+        uint amount1 = 475 * 10**17;
+        uint amount2 = 1425 * 10**17;
+
+        IncomeEscrowed(user1, amount1, true);
+        SharesDistributed(user1, 1, amount2, true);
 
         manager.allocate(user1, user2, 1);
         manager.escrow(user1, 0, 1000);
@@ -308,10 +264,8 @@ contract EcosystemTest is DSTest, TrustMediatorEvents, TrustShareManagerEvents {
 
         assertEq(manager.getEscrow(user1), 0);
         assertEq(manager.getShare(user1, user2), 1);
-        assertEq(token.balanceOf(this), 23);
-        assertEq(token.balanceOf(user1), 0);
-        assertEq(token.balanceOf(manager), 167);
-        assertEq(token.allowance(manager, user1), 49);
-        assertEq(token.allowance(manager, user2), 118);
+        assertEq(token.balanceOf(this), amount1);
+        assertEq(token.balanceOf(manager), amount2);
+        assertEq(token.allowance(manager, user2), amount2);
     }
 }

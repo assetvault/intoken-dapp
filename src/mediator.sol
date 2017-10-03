@@ -69,13 +69,8 @@ contract TrustMediator is Mediator, TrustMediatorEvents, DSStop {
         require(State.Initiated == _transitions[msg.sender][ambassador]);
 
         uint deposit = _proxy.getPricing().priceIntro(ambassador);
-        require(_proxy.getToken().balanceOf(msg.sender) >= deposit);
-        require(_proxy.getToken().allowance(msg.sender, this) >= deposit);
-
         _transitions[msg.sender][ambassador] = State.Confirmed;
         _deposits[msg.sender][ambassador] = deposit;
-
-        res = _proxy.getToken().transferFrom(msg.sender, this, deposit);
 
         Confirmed(msg.sender, ambassador, res);
     }
@@ -118,13 +113,12 @@ contract TrustMediator is Mediator, TrustMediatorEvents, DSStop {
         _transitions[vendor][ambassador] = State.Stale;
 
         if (State.Endorsed == state) {
+            _proxy.getToken().mint(uint128(deposit));
             res = _proxy.getShareManager().allocate(vendor, ambassador, 1);
             res = res && _proxy.getScoring().scoreUp(ambassador);
             res = res && _proxy.getToken().approve(ambassador, deposit);
-        }
-        if (State.Disendorsed == state) {
+        } else if (State.Disendorsed == state) {
             res = _proxy.getScoring().scoreDown(ambassador);
-            res = res && _proxy.getToken().approve(vendor, deposit);
         }
 
         Resolved(vendor, ambassador, res);
