@@ -1,11 +1,21 @@
 FROM dapp:latest
-RUN sudo mkdir -p /src/inbot-dapp
 
-WORKDIR /src/inbot-dapp
-COPY . .
-COPY ./.git .git
+USER root
+ENV USER root
+RUN mkdir -p /opt/inbot-dapp
 
-RUN sudo dapp install ds-token
-RUN sudo dapp build
+WORKDIR /opt/inbot-dapp
 
-CMD [ "sudo", "dapp", "test"]
+RUN git init
+RUN git config --global user.email "jenkins@inbot.io"
+RUN git config --global user.name "Jenkins"
+
+RUN dapp install ds-test
+RUN dapp install ds-token
+
+COPY Dappfile ./Dappfile
+COPY Makefile ./Makefile
+COPY src/ ./src
+RUN dapp build
+
+CMD [ "dapp", "test"]
