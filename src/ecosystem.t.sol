@@ -239,7 +239,7 @@ contract EcosystemTest is DSTest, DSMath, TrustMediatorEvents, TrustShareManager
     function testEscrowIncome() logs_gas {
         expectEventsExact(manager);
 
-        uint amount = 475 * 10**17;
+        uint amount = 475 * 10**19;
         IncomeEscrowed(user1, amount, true);
 
         manager.escrow(user1, 0, 1000);
@@ -252,8 +252,8 @@ contract EcosystemTest is DSTest, DSMath, TrustMediatorEvents, TrustShareManager
     function testDistributeShares() logs_gas {
         expectEventsExact(manager);
 
-        uint amount1 = 475 * 10**17;
-        uint amount2 = 1425 * 10**17;
+        uint amount1 = 475 * 10**19;
+        uint amount2 = 1425 * 10**19;
 
         IncomeEscrowed(user1, amount1, true);
         SharesDistributed(user1, 1, amount2, true);

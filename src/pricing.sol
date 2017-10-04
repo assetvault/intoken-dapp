@@ -60,7 +60,7 @@ contract TrustPricing is Pricing, DSStop, DSMath {
 
     function priceShare(uint8 shareType, uint amount) stoppable returns (uint tokens) {
         uint128 wadAmount = cast(mul(WAD, amount));
-    	uint128 mintedAmount = wmul(wadAmount, _tokenPrice);
+    	uint128 mintedAmount = wdiv(wadAmount, _tokenPrice);
 
     	require((tokens = wmul(mintedAmount, _sharePricing[shareType])) > 0); 
     }
