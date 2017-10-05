@@ -17,20 +17,20 @@ contract TrustPricing is Pricing, DSStop, DSMath {
 	}
 
     TrustProxy                    			   _proxy;
-    uint128                                    _tokenPrice;
-    mapping (uint8 => uint128)  			   _sharePricing;
+    uint                                       _tokenPrice;
+    mapping (uint8 => uint)  			       _sharePricing;
 
     function TrustPricing() {
-        _tokenPrice = hdiv(WAD, uint128(10));
+        _tokenPrice = WAD / 10;
         // setting pricing in % per share type
-         uint128 sharePrice = hdiv(WAD, uint128(100));
-    	_sharePricing[uint8(ShareType.Fiat)] = hmul(uint128(95), sharePrice);
-    	_sharePricing[uint8(ShareType.MajorStocks)] = hmul(uint128(90), sharePrice);
-    	_sharePricing[uint8(ShareType.BTC)] = hmul(uint128(85), sharePrice);
-    	_sharePricing[uint8(ShareType.ETH)] = hmul(uint128(85), sharePrice);
-    	_sharePricing[uint8(ShareType.MinorStocks)] = hmul(uint128(75), sharePrice);
-    	_sharePricing[uint8(ShareType.Crypto)] = hmul(uint128(70), sharePrice);
-    	_sharePricing[uint8(ShareType.StartupStocks)] = hmul(uint128(50), sharePrice);
+         uint sharePrice = WAD / 100;
+    	_sharePricing[uint8(ShareType.Fiat)] = mul(95, sharePrice);
+    	_sharePricing[uint8(ShareType.MajorStocks)] = mul(90, sharePrice);
+    	_sharePricing[uint8(ShareType.BTC)] = mul(85, sharePrice);
+    	_sharePricing[uint8(ShareType.ETH)] = mul(85, sharePrice);
+    	_sharePricing[uint8(ShareType.MinorStocks)] = mul(75, sharePrice);
+    	_sharePricing[uint8(ShareType.Crypto)] = mul(70, sharePrice);
+    	_sharePricing[uint8(ShareType.StartupStocks)] = mul(50, sharePrice);
     }
 
     modifier proxyExists() {
@@ -46,21 +46,21 @@ contract TrustPricing is Pricing, DSStop, DSMath {
         return _tokenPrice;
     }
 
-    function setTokenPrice(uint128 tokenPrice) auth stoppable note {
+    function setTokenPrice(uint tokenPrice) auth stoppable note {
         _tokenPrice = tokenPrice;
     }
 
-    function getSharePricing(uint8 shareType) stoppable constant returns (uint128 pricing) {
+    function getSharePricing(uint8 shareType) stoppable constant returns (uint pricing) {
         return _sharePricing[shareType];
     }
 
-    function setSharePricing(uint8 shareType, uint128 pricing) auth stoppable note {
+    function setSharePricing(uint8 shareType, uint pricing) auth stoppable note {
         _sharePricing[shareType] = pricing;
     }
 
     function priceShare(uint8 shareType, uint amount) stoppable returns (uint tokens) {
-        uint128 wadAmount = cast(mul(WAD, amount));
-    	uint128 mintedAmount = wdiv(wadAmount, _tokenPrice);
+        uint wadAmount = mul(WAD, amount);
+    	uint mintedAmount = wdiv(wadAmount, _tokenPrice);
 
     	require((tokens = wmul(mintedAmount, _sharePricing[shareType])) > 0); 
     }

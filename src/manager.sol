@@ -66,7 +66,7 @@ contract TrustShareManager is ShareManager, TrustShareManagerEvents, DSStop, DSM
 		uint totalTokens = _proxy.getPricing().priceShare(shareType, amount);
 
 		DSToken token = _proxy.getToken(); 
-		token.mint(uint128(totalTokens));
+		token.mint(totalTokens);
 
 		uint oneHalf = div(totalTokens, 2);
 
@@ -86,7 +86,7 @@ contract TrustShareManager is ShareManager, TrustShareManagerEvents, DSStop, DSM
 		// figuring out the share pricing
 		uint totalTokens = _proxy.getPricing().priceShare(shareType, amount);
 		// performing trusted mint op
-		_proxy.getToken().mint(uint128(totalTokens));
+		_proxy.getToken().mint(totalTokens);
 		// adding a total amount of accumulated escrows
 		totalTokens = add(totalTokens, _escrows[vendor]);
 		// zeroing escrows to avoid double-spending

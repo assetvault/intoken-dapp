@@ -113,7 +113,7 @@ contract TrustMediator is Mediator, TrustMediatorEvents, DSStop {
         _transitions[vendor][ambassador] = State.Stale;
 
         if (State.Endorsed == state) {
-            _proxy.getToken().mint(uint128(deposit));
+            _proxy.getToken().mint(deposit);
             res = _proxy.getShareManager().allocate(vendor, ambassador, 1);
             res = res && _proxy.getScoring().scoreUp(ambassador);
             res = res && _proxy.getToken().approve(ambassador, deposit);
