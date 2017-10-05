@@ -68,7 +68,7 @@ contract TrustShareManager is ShareManager, TrustShareManagerEvents, DSStop, DSM
 		DSToken token = _proxy.getToken(); 
 		token.mint(totalTokens);
 
-		uint oneHalf = div(totalTokens, 2);
+		uint oneHalf = totalTokens / 2;
 
 		_escrows[vendor] = add(_escrows[vendor], sub(totalTokens, oneHalf));
 		res = token.transfer(token.owner(), oneHalf);
@@ -104,7 +104,7 @@ contract TrustShareManager is ShareManager, TrustShareManagerEvents, DSStop, DSM
 		}
 
 		if (totalShares > 0) {
-			sharePrice = div(totalTokens, totalShares);
+			sharePrice = totalTokens / totalShares;
 			// allocating Trust Tokens according to shares
 			for(i = 0; i<_keys[vendor].length; i++) {
 				ambassador = _keys[vendor][i];
