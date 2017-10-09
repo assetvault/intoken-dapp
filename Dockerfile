@@ -15,6 +15,12 @@ COPY Makefile ./Makefile
 COPY src/ ./src
 
 RUN dapp install ds-token
-RUN dapp build
+RUN dapp test
 
-CMD [ "dapp", "test"]
+RUN mkdir /etc/nix
+RUN touch /etc/nix/nix.conf
+RUN echo "build-users-group =" > /etc/nix/nix.conf
+RUN curl https://nixos.org/nix/install | bash
+RUN /nix/var/nix/profiles/default/bin/nix-env -i ethabi jshon bc
+
+CMD ["/bin/bash"]
