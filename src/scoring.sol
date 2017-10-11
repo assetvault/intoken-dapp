@@ -16,7 +16,7 @@ contract TrustScoring is Scoring, DSStop, DSMath {
 		_defaultScore = 50;
 	}
 
-	function getScore(address user) stoppable constant returns (uint score) {
+	function getScore(address user) stoppable constant returns (uint) {
 		return _initialized[user] ? _scores[user] : _defaultScore;
 	}
 
@@ -33,13 +33,13 @@ contract TrustScoring is Scoring, DSStop, DSMath {
 		_defaultScore = defaultScore;
 	}
 
-	function scoreDown(address user) auth stoppable note returns (bool res) {
+	function scoreDown(address user) auth stoppable note returns (bool) {
 		setScore(user, max(0, sub(getScore(user), _scoreIncrement)));
 
 		return true;
 	}
 
-	function scoreUp(address user) auth stoppable note returns (bool res) {
+	function scoreUp(address user) auth stoppable note returns (bool) {
 		setScore(user, min(200, add(getScore(user), _scoreIncrement)));
 
 		return true;

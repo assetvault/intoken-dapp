@@ -42,7 +42,7 @@ contract TrustPricing is Pricing, DSStop, DSMath {
         _proxy = TrustProxy(proxy);
     }
 
-    function getTokenPrice() stoppable constant returns (uint price) {
+    function getTokenPrice() stoppable constant returns (uint) {
         return _tokenPrice;
     }
 
@@ -50,7 +50,7 @@ contract TrustPricing is Pricing, DSStop, DSMath {
         _tokenPrice = tokenPrice;
     }
 
-    function getSharePricing(uint8 shareType) stoppable constant returns (uint pricing) {
+    function getSharePricing(uint8 shareType) stoppable constant returns (uint) {
         return _sharePricing[shareType];
     }
 

@@ -76,19 +76,14 @@ contract TrustShareManager is ShareManager, TrustShareManagerEvents, DSStop, DSM
 		IncomeEscrowed(vendor, totalTokens, res);
 	}
 
-	function distribute(address vendor, uint8 shareType, uint amount)
+	function distribute(address vendor)
 		auth 
 		stoppable
 		note
 		proxyExists
 		returns (bool res)
 	{
-		// figuring out the share pricing
-		uint totalTokens = _proxy.getPricing().priceShare(shareType, amount);
-		// performing trusted mint op
-		_proxy.getToken().mint(totalTokens);
-		// adding a total amount of accumulated escrows
-		totalTokens = add(totalTokens, _escrows[vendor]);
+		uint distributedTokens = _escrows[vendor];
 		// zeroing escrows to avoid double-spending
 		_escrows[vendor] = 0; 
 
@@ -104,12 +99,14 @@ contract TrustShareManager is ShareManager, TrustShareManagerEvents, DSStop, DSM
 		}
 
 		if (totalShares > 0) {
-			sharePrice = totalTokens / totalShares;
+			sharePrice = distributedTokens / totalShares;
 			// allocating Trust Tokens according to shares
 			for(i = 0; i<_keys[vendor].length; i++) {
 				ambassador = _keys[vendor][i];
 				ambassadorShares = _shares[vendor][ambassador];
-				res = res && _proxy.getToken().approve(ambassador, mul(sharePrice, ambassadorShares));
+				if (ambassadorShares > 0) {
+					res = res && _proxy.getToken().approve(ambassador, mul(sharePrice, ambassadorShares));
+				}
 			}			
 		}
 

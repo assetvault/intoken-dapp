@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.16;
 
 import "ds-auth/auth.sol";
 
@@ -17,7 +17,7 @@ contract TrustGuardEvents {
 }
 
 contract TrustGuard is DSAuth, DSAuthority, TrustGuardEvents {
-    bytes32 constant public ANY = bytes32(uint(-1));
+    bytes32 constant public ANY = bytes32(0);
 
     mapping (bytes32 => mapping (bytes32 => mapping (bytes32 => bool))) acl;
 

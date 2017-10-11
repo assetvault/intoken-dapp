@@ -11,8 +11,8 @@ interface Mediator {
 interface ShareManager {
 	function getShare(address vendor, address ambassador) constant returns (uint share);
 	function allocate(address vendor, address ambassador, uint shares) returns (bool res);
-	function distribute(address vendor, uint8 shareType, uint amount) returns (bool res);
 	function escrow(address vendor, uint8 shareType, uint amount) returns (bool res);
+	function distribute(address vendor) returns (bool res);
 }
 
 interface Pricing {

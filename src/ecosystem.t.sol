@@ -18,24 +18,6 @@ contract EcosystemUser {
         proxy = _proxy;
     }
 
-    function doTransferFrom(address from, address to, uint amount)
-        returns (bool)
-    {
-        return proxy.getToken().transferFrom(from, to, amount);
-    }
-
-    function doTransfer(address to, uint amount)
-        returns (bool)
-    {
-        return proxy.getToken().transfer(to, amount);
-    }
-
-    function doApprove(address recipient, uint amount)
-        returns (bool)
-    {
-        return proxy.getToken().approve(recipient, amount);
-    }
-
     function doScoreUp() returns (bool) {
         proxy.getScoring().scoreUp(this);
     }
@@ -90,7 +72,6 @@ contract EcosystemTest is DSTest, DSMath, TrustMediatorEvents, TrustShareManager
 
         guard.permit(mediator, scoring, guard.ANY());
         guard.permit(mediator, manager, guard.ANY());
-        guard.permit(pricing, scoring, guard.ANY());
         guard.permit(mediator, token, guard.ANY());
         guard.permit(manager, token, guard.ANY());
         scoring.setAuthority(guard);
@@ -252,20 +233,19 @@ contract EcosystemTest is DSTest, DSMath, TrustMediatorEvents, TrustShareManager
     function testDistributeShares() logs_gas {
         expectEventsExact(manager);
 
-        uint amount1 = 475 * 10**19;
-        uint amount2 = 1425 * 10**19;
+        uint amount = 475 * 10**19;
 
-        IncomeEscrowed(user1, amount1, true);
-        SharesDistributed(user1, 1, amount2, true);
+        IncomeEscrowed(user1, amount, true);
+        SharesDistributed(user1, 1, amount, true);
 
         manager.allocate(user1, user2, 1);
         manager.escrow(user1, 0, 1000);
-        manager.distribute(user1, 0, 1000);
+        manager.distribute(user1);
 
         assertEq(manager.getEscrow(user1), 0);
         assertEq(manager.getShare(user1, user2), 1);
-        assertEq(token.balanceOf(this), amount1);
-        assertEq(token.balanceOf(manager), amount2);
-        assertEq(token.allowance(manager, user2), amount2);
+        assertEq(token.balanceOf(this), amount);
+        assertEq(token.balanceOf(manager), amount);
+        assertEq(token.allowance(manager, user2), amount);
     }
 }
