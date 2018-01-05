@@ -1,6 +1,5 @@
 pragma solidity ^0.4.17;
 
-import "zeppelin-solidity/contracts/ownership/CanReclaimToken.sol";
 import "./Interfaces.sol";
 import "./Proxy.sol";
 import "./Inbot.sol";
@@ -14,7 +13,7 @@ contract InbotMediatorGatewayEvents {
     event Resolved(uint indexed id, address indexed actor, uint indexed time);
 } 
 
-contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGatewayEvents, InbotContract {
+contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotContract {
 
     enum State {Null, Open, Accepted, Endorsed, Disputed, Withdrawn}
 
@@ -82,10 +81,6 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         ambassadorPercentage = WAD/100 * _percentage; 
     }
 
-    function reclaimToken() public onlyAdmin proxyExists {
-        this.reclaimToken(proxy.getToken());
-    }
-
     function open(
         uint _introId, 
         uint _bid, 
@@ -123,7 +118,6 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         uint _updateTime
     )
         public
-        proxyExists
         whenNotPaused 
         isVendor(_introId)
         atState(_introId, State.Open)
@@ -169,7 +163,6 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         uint _updateTime
     )
         public
-        proxyExists
         isVendor(_introId)
         atState(_introId, State.Accepted)
         transition(_introId, State.Disputed)

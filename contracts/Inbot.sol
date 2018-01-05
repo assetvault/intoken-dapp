@@ -1,7 +1,8 @@
 pragma solidity ^0.4.17;
 
-import "zeppelin-solidity/contracts/lifecycle/TokenDestructible.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "zeppelin-solidity/contracts/lifecycle/TokenDestructible.sol";
+import "zeppelin-solidity/contracts/ownership/CanReclaimToken.sol";
 import "zeppelin-solidity/contracts/ownership/rbac/RBAC.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Proxy.sol";
@@ -13,7 +14,7 @@ contract InbotControlled is RBAC {
     string public constant ROLE_VENDOR = "vendor";
 }
 
-contract InbotContract is InbotControlled, TokenDestructible, Pausable {
+contract InbotContract is InbotControlled, TokenDestructible, CanReclaimToken, Pausable {
     using SafeMath for uint;
 
     uint public constant WAD = 10**18;
@@ -27,6 +28,10 @@ contract InbotContract is InbotControlled, TokenDestructible, Pausable {
 
     function setProxy(address _proxy) public onlyAdmin {
         proxy = InbotProxy(_proxy);
+    }
+
+    function reclaimToken() public proxyExists onlyAdmin {
+        this.reclaimToken(proxy.getToken());
     }
 
     function pause() public onlyAdmin whenNotPaused {
