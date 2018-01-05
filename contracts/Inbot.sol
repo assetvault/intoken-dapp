@@ -25,19 +25,19 @@ contract InbotContract is InbotControlled, TokenDestructible, Pausable {
         _;
     }
 
-    function setProxy(address _proxy) onlyAdmin {
+    function setProxy(address _proxy) public onlyAdmin {
         proxy = InbotProxy(_proxy);
     }
 
-    function pause() onlyAdmin whenNotPaused {
+    function pause() public onlyAdmin whenNotPaused {
         super.pause();
     }
 
-    function unpause() onlyAdmin whenPaused {
+    function unpause() public onlyAdmin whenPaused {
         super.unpause();
     }
 
-    function getTime(uint _time) internal returns (uint t) {
+    function getTime(uint _time) internal view returns (uint t) {
         return _time == 0 ? now : _time;
     }
 

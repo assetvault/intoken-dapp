@@ -17,42 +17,43 @@ contract InbotProxy is RBAC, Pausable {
 		address _share, 
 		address _score, 
 		address _mediator
-	) {
+	) public 
+	{
 		token = StandardToken(_token);
 		share = MintableToken(_share);
 		score = Score(_score);
 		mediator = Mediator(_mediator);
 	}
 
-	function setToken(address _token) onlyAdmin {
+	function setToken(address _token) public onlyAdmin {
 		token = StandardToken(_token);
 	}
 
-	function getToken() whenNotPaused returns (StandardToken) {
+	function getToken() whenNotPaused public view returns (StandardToken) {
 		return token;
 	}
 
-	function setShare(address _share) onlyAdmin {
+	function setShare(address _share) public onlyAdmin {
 		share = MintableToken(_share);
 	}
 
-	function getShare() whenNotPaused returns (MintableToken) {
+	function getShare() whenNotPaused public view returns (MintableToken) {
 		return share;
 	}
 
-	function setScore(address _score) onlyAdmin {
+	function setScore(address _score) public onlyAdmin {
 		score = Score(_score);
 	}
 
-	function getScore() whenNotPaused returns (Score) {
+	function getScore() public whenNotPaused view returns (Score) {
 		return score;
 	}
 
-	function setMediator(address _mediator) onlyAdmin {
+	function setMediator(address _mediator) public onlyAdmin {
 		mediator = Mediator(_mediator);
 	}
 
-	function getMediator() whenNotPaused returns (Mediator) {
+	function getMediator() whenNotPaused public view returns (Mediator) {
 		return mediator;
 	}
 }

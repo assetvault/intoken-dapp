@@ -19,7 +19,7 @@ contract InbotToken is InbotContract, MintableToken, BurnableToken, PausableToke
 contract InToken is InbotToken("InToken", "INT", 18), CappedToken {
 	uint public constant MAX_SUPPLY = 10*RAY;
 
-	function InToken() CappedToken(MAX_SUPPLY) {
+	function InToken() CappedToken(MAX_SUPPLY) public {
 	}
 	
 }
@@ -33,7 +33,7 @@ contract InShareEvents {
 */
 contract InShare is InbotToken("InShare", "INS", 5), InShareEvents {
 	
-	function InShare() {
+	function InShare() public {
 		paused = true;
 	}
 
@@ -55,7 +55,7 @@ contract InShare is InbotToken("InShare", "INS", 5), InShareEvents {
 	 * @param receiver    Divident receiver address.
 	 */
 	function distributeTokens(address receiver) 
-		external
+		public
 		onlyRole(ROLE_VENDOR) 
 		proxyExists
 	{
@@ -91,7 +91,7 @@ contract InShare is InbotToken("InShare", "INS", 5), InShareEvents {
 	 * @param tokensPerShare    INT tokens per InShare.
 	 */
 	function distributeTokens(address receiver, uint tokensPerShare)
-		external
+		public
 		onlyRole(ROLE_VENDOR) 
 		proxyExists
 	{

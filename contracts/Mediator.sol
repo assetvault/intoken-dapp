@@ -74,17 +74,17 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         intros[_introId].state = _state;
     }
 
-    function InbotMediatorGateway(address _platformFeeVault) {
+    function InbotMediatorGateway(address _platformFeeVault) public {
         ambassadorPercentage = WAD/100 * 70;
         platformFeeVault = _platformFeeVault;
     }
     
-    function setAmbassadorPercentage(uint _percentage) onlyAdmin {
+    function setAmbassadorPercentage(uint _percentage) public onlyAdmin {
         require(_percentage > 0 && _percentage < 100);
         ambassadorPercentage = WAD/100 * _percentage; 
     }
 
-    function reclaimToken() external onlyAdmin proxyExists {
+    function reclaimToken() public onlyAdmin proxyExists {
         this.reclaimToken(proxy.getToken());
     }
 
@@ -94,7 +94,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         uint _creationTime,
         string _hashedInfo
     )
-        external
+        public
         proxyExists
         whenNotPaused
         atState(_introId, State.Null)
@@ -124,7 +124,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         address _ambassador,
         uint _updateTime
     )
-        external
+        public
         proxyExists
         whenNotPaused 
         isVendor(_introId)
@@ -140,7 +140,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         uint _introId, 
         uint _updateTime
     )
-        external
+        public
         proxyExists
         whenNotPaused 
         isVendor(_introId)
@@ -170,7 +170,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         uint _introId, 
         uint _updateTime
     )
-        external
+        public
         proxyExists
         isVendor(_introId)
         atState(_introId, State.Accepted)
@@ -183,7 +183,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         uint _introId, 
         uint _updateTime
     )
-        external
+        public
         proxyExists
         whenNotPaused 
         isIntroParty(_introId)
@@ -207,7 +207,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         string _resolution,
         bool _isSpam
     )
-        external
+        public
         proxyExists
         whenNotPaused 
         onlyAdmin
