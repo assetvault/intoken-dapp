@@ -1,0 +1,3 @@
+# Inbot-dapp
+
+- (LICENSE)[License]
