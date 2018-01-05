@@ -1,8 +1,8 @@
 # InToken dApp
 
-InToken is a utility token that businesses use to reward people who make them customer referrals. 
+InToken is a utility token for businesses to reward a community of people who make them introductions to customers. 
 
-InShare is a crypto-security that pays token dividends on regular intervals. InShares can be earned by making introductions to businesses who are listed on Inbot Ambassador platform.
+InShare is a crypto-security that pays community members token dividends on regular intervals. InShares can be earned by making introductions to businesses who are listed as qualified vendors on the Inbot Ambassador platform.
 
 InScore is a smart contract that manages the compensation multiplier of Ambassadors. This is an automated way of enforcing good behavior of the community members.
 
