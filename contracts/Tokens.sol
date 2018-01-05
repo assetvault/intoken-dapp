@@ -9,7 +9,7 @@ import "./Interfaces.sol";
 import "./Inbot.sol";
 
 contract InbotToken is InbotContract, MintableToken, BurnableToken, PausableToken, DetailedERC20 {
-	function InbotToken (string _name, string _symbol, uint8 _decimals) DetailedERC20(_name, _symbol, _decimals) {
+	function InbotToken (string _name, string _symbol, uint8 _decimals) DetailedERC20(_name, _symbol, _decimals) public {
 	}
 } 
 

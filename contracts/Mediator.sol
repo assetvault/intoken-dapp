@@ -48,8 +48,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
      *  @param _introId Intro Id
      */
     modifier isVendor(uint _introId) {
-        require(intros[_introId].vendor == msg.sender
-            || hasRole(msg.sender, ROLE_ADMIN));
+        require(intros[_introId].vendor == msg.sender);
         _;
     }
 
@@ -59,8 +58,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
      */
     modifier isIntroParty(uint _introId) {
         require(intros[_introId].ambassador == msg.sender
-             || intros[_introId].vendor == msg.sender
-             || hasRole(msg.sender, ROLE_ADMIN));
+             || intros[_introId].vendor == msg.sender);
         _;
     }
 
@@ -152,7 +150,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
         uint ambassadorScore = proxy.getScore().getScore(intro.ambassador);
         uint ambassadorPercent = wmul(ambassadorScore/2, ambassadorPercentage);
         uint ambassadorFee = wmul(intro.bid, ambassadorPercent);
-        uint platformFee = wmul(intro.bid, WAD - ambassadorPercent);
+        uint platformFee = intro.bid - ambassadorFee;
 
         proxy.getToken().transfer(intro.ambassador, ambassadorFee);
         proxy.getToken().transfer(platformFeeVault, platformFee);
@@ -221,7 +219,7 @@ contract InbotMediatorGateway is Mediator, CanReclaimToken, InbotMediatorGateway
             Opened(_introId, msg.sender, getTime(_updateTime));
         } else {
             intro.resolution = _resolution;
-            this.endorse(_introId, _updateTime);
+            endorse(_introId, _updateTime);
         }
     } 
 
