@@ -1,3 +1,3 @@
 # Inbot-dapp
 
-- (LICENSE)[License]
+- [license](LICENSE)
