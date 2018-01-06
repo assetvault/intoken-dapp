@@ -34,6 +34,16 @@ contract("InToken", function(accounts) {
       await token.mint(accounts[0], totalCap.valueOf());
       throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
     } catch (error) {
+      assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
+    }
+  });
+
+  it("should fail to transfer to non-ERC223 compliant contract address", async() => {
+    try {
+      let result = await token.transfer(InScore.address, 1);
+      throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
+    } catch (error) {
+      assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
     }
   });
 
@@ -52,6 +62,16 @@ contract("InToken", function(accounts) {
       let result = await token.transfer(accounts[2], 1, {from: accounts[1]});
       throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
     } catch (error) {
+      assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
+    }
+  });
+
+  it("should fail to transfer from account_0 to non-ERC223 compliant contract address", async() => {
+    try {
+      let result = await token.transferFrom(accounts[0], InScore.address, oneINT.valueOf(), {from: accounts[1]});
+      throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
+    } catch (error) {
+      assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
     }
   });
 
@@ -62,14 +82,34 @@ contract("InToken", function(accounts) {
     assert.equal(event.to, accounts[1]);
     assert.equal(event.value, oneINT.valueOf());
     let balance = await token.balanceOf.call(accounts[1]);
-    assert.equal(balance, oneINT.valueOf());
+    assert.equal(balance, oneINT.valueOf(), "1 INT in the account_2");
   });
 
-  it("should fail to transfer to non ERC223 compliant contract", async() => {
+  it("should burn all of the owner's tokens", async() => {
+    let result = await token.burn(oneINT.valueOf(), {from: accounts[1]});
+    let event = result.logs[0].args;
+    assert(event.burner, accounts[1]);
+    assert(event.value, oneINT.valueOf());
+    let balance = await token.balanceOf.call(accounts[1]);
+    assert.equal(balance.valueOf(), 0, "0 was in the owning account");
+  });
+
+  it("should fail to pause from non-admin account", async() => {
     try {
-      let result = await token.transfer(InScore.address, 1);
+      let result = await token.pause({from: accounts[1]});
       throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
     } catch (error) {
+      assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
+    }
+  });
+
+  it("should fail to operate once token is paused", async() => {
+    let result = await token.pause();
+    try {
+      let result = await token.transfer(accounts[1], 1);
+      throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
+    } catch (error) {
+      assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
     }
   });
 });
