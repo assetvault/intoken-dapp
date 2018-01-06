@@ -9,6 +9,6 @@ InScore is a smart contract that manages the compensation multiplier of Ambassad
 Inbot Mediator Gateway automates the processes of opening an intro bid, contracting the ambassador, mediating the result, and in case of successful delivery, automatically transferring the rewards to the ambassador's token address.
 
 - [Whitepaper](https://docs.google.com/document/d/12siRqjuHIHelPS-NaVVZxnq4AJ1hGlDXoGo6DeVw51U/edit?usp=sharing)
-
-- [license](LICENSE)
 - [Inbot](https://inbot.io)
+- [license](LICENSE)
+
