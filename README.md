@@ -24,7 +24,7 @@ Read more: [Whitepaper](https://docs.google.com/document/d/12siRqjuHIHelPS-NaVVZ
 
 Company website: [Inbot](https://inbot.io)
 
-Software license: [License](LICENSE)
+Software license: [MIT License](LICENSE)
 
 ## Main contracts
 *  **InToken**
