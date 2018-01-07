@@ -1,8 +1,8 @@
 const BigNumber = require("bignumber.js");
 const InToken = artifacts.require("InToken");
 const InScore = artifacts.require("InScore");
-const totalCap = new BigNumber("1e+28");
-const oneINT = new BigNumber("1e+18");
+const totalCap = BigNumber("1e+28");
+const oneINT = BigNumber("1e+18");
 
 contract("InToken", function(accounts) {
   let token; 
@@ -47,7 +47,7 @@ contract("InToken", function(accounts) {
     }
   });
 
-  it("should allow account_1 to spend 1INT", async() => {
+  it("should allow account_1 to spend 1 INT", async() => {
     let result = await token.approve(accounts[1], oneINT.valueOf());
     let event = result.logs[0].args;
     assert.equal(event.owner, accounts[0]);
@@ -75,7 +75,7 @@ contract("InToken", function(accounts) {
     }
   });
 
-  it("should allow account_1 to transfer 1INT to itself from account_0", async() => {
+  it("should allow account_1 to transfer 1 INT to itself from account_0", async() => {
     let result = await token.transferFrom(accounts[0], accounts[1], oneINT.valueOf(), {from: accounts[1]});
     let event = result.logs[0].args;
     assert.equal(event.from, accounts[0]);
@@ -103,7 +103,7 @@ contract("InToken", function(accounts) {
     }
   });
 
-  it("should fail to operate once token is paused", async() => {
+  it("should fail to transfer once token is paused", async() => {
     let result = await token.pause();
     try {
       let result = await token.transfer(accounts[1], 1);

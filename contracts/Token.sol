@@ -10,7 +10,6 @@ import "./Inbot.sol";
  /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
 contract ERC223ReceivingContract { 
 	/**
 	 * @dev Standard ERC223 function that will handle incoming token transfers.
@@ -22,6 +21,9 @@ contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
+ /**
+ * @title Base Contract that will InToken and InShare inherit.
+ */
 contract InbotToken is InbotContract, MintableToken, BurnableToken, PausableToken, DetailedERC20 {
 	event InbotTokenTransfer(address indexed from, address indexed to, uint value, bytes data);
 
@@ -47,11 +49,27 @@ contract InbotToken is InbotContract, MintableToken, BurnableToken, PausableToke
 	}
 
 	/**
+	* @dev Function which allows to mint tokens from another "admin" address. 
+	* @param _to The address that will receive the minted tokens.
+	* @param _amount The amount of tokens to mint.
+	* @return A boolean that indicates if the operation was successful.
+	*/
+	function mint(address _to, uint256 _amount) public onlyAdmin canMint returns (bool) {
+		// TODO: a hook to allow other contracts call "mint" without applying parent modifiers
+		totalSupply = totalSupply.add(_amount);
+		balances[_to] = balances[_to].add(_amount);
+		Mint(_to, _amount);
+		Transfer(address(0), _to, _amount);
+		return true;
+	}
+
+	/**
 	* @dev Transfer the specified amount of ERC223 compliant tokens to the specified address.
 	* @param _from 	The address to transfer from.
 	* @param _to 	The address to transfer to.
 	* @param _value The amount to be transferred.
 	* @param _data  Transaction metadata.
+	* @return A boolean that indicates if the operation was successful.
 	*/
 	function transferFrom(address _from, address _to, uint256 _value, bytes _data) public whenNotPaused returns (bool) {
 		assert(super.transferFrom(_from, _to, _value));
@@ -63,6 +81,7 @@ contract InbotToken is InbotContract, MintableToken, BurnableToken, PausableToke
 	* @param _from 	The address to transfer from.
 	* @param _to 	The address to transfer to.
 	* @param _value The amount to be transferred.
+	* @return A boolean that indicates if the operation was successful.
 	*/
 	function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
 		bytes memory empty;
@@ -74,6 +93,7 @@ contract InbotToken is InbotContract, MintableToken, BurnableToken, PausableToke
 	* @param _to 	The address to transfer to.
 	* @param _value The amount to be transferred.
 	* @param _data  Transaction metadata.
+	* @return A boolean that indicates if the operation was successful.
 	*/
 	function transfer(address _to, uint256 _value, bytes _data) public whenNotPaused returns (bool) {
 		assert(super.transfer(_to, _value));
@@ -85,6 +105,7 @@ contract InbotToken is InbotContract, MintableToken, BurnableToken, PausableToke
      *      
      * @param _to    Receiver address.
      * @param _value Amount of tokens that will be transferred.
+     * @return A boolean that indicates if the operation was successful.
      */
     function transfer(address _to, uint _value) public whenNotPaused returns (bool) {
         bytes memory empty;

@@ -11,10 +11,10 @@ contract InScore is Score, InbotContract {
 	uint					  public maxScore;
 
 	function InScore() public {
-		// setting scoring increment/default in %
-		scoreIncrement = WAD/10;
-		defaultScore = WAD/2;
-		maxScore = WAD/2;
+		// setting scoring increment/default IN%
+		scoreIncrement = WAD.div(10);
+		defaultScore = WAD.div(2);
+		maxScore = WAD.mul(2);
 	}
 
 	function getScore(address _user) public view whenNotPaused returns (uint) {
@@ -39,13 +39,13 @@ contract InScore is Score, InbotContract {
 	}
 
 	function scoreDown(address _user) public onlyAdmin whenNotPaused returns (bool) {
-		setScore(_user, max(0, getScore(_user) - scoreIncrement));
+		setScore(_user, max(0, getScore(_user).sub(scoreIncrement)));
 
 		return true;
 	}
 
 	function scoreUp(address _user) public onlyAdmin whenNotPaused returns (bool) {
-		setScore(_user, min(maxScore, getScore(_user) + scoreIncrement));
+		setScore(_user, min(maxScore, getScore(_user).add(scoreIncrement)));
 
 		return true;
 	}

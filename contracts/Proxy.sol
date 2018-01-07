@@ -2,12 +2,12 @@ pragma solidity ^0.4.17;
 
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/ownership/rbac/RBAC.sol";
-import "zeppelin-solidity/contracts/token/StandardToken.sol";
+import "zeppelin-solidity/contracts/token/MintableToken.sol";
 import "zeppelin-solidity/contracts/token/MintableToken.sol";
 import "./Interfaces.sol";
 
 contract InbotProxy is RBAC, Pausable {
-	StandardToken	token;
+	MintableToken	token;
 	MintableToken	share;
 	Score 			score;
 	Mediator 		mediator;
@@ -19,17 +19,17 @@ contract InbotProxy is RBAC, Pausable {
 		address _mediator
 	) public 
 	{
-		token = StandardToken(_token);
+		token = MintableToken(_token);
 		share = MintableToken(_share);
 		score = Score(_score);
 		mediator = Mediator(_mediator);
 	}
 
 	function setToken(address _token) public onlyAdmin {
-		token = StandardToken(_token);
+		token = MintableToken(_token);
 	}
 
-	function getToken() whenNotPaused public view returns (StandardToken) {
+	function getToken() whenNotPaused public view returns (MintableToken) {
 		return token;
 	}
 

@@ -72,13 +72,13 @@ contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotCont
     }
 
     function InbotMediatorGateway(address _platformFeeVault) public {
-        ambassadorPercentage = WAD/100 * 70;
+        ambassadorPercentage = WAD.div(100).mul(70);
         platformFeeVault = _platformFeeVault;
     }
     
     function setAmbassadorPercentage(uint _percentage) public onlyAdmin {
         require(_percentage > 0 && _percentage < 100);
-        ambassadorPercentage = WAD/100 * _percentage; 
+        ambassadorPercentage = WAD.div(100).mul(_percentage); 
     }
 
     function open(
@@ -142,7 +142,7 @@ contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotCont
         Intro storage intro = intros[_introId];
 
         uint ambassadorScore = proxy.getScore().getScore(intro.ambassador);
-        uint ambassadorPercent = wmul(ambassadorScore/2, ambassadorPercentage);
+        uint ambassadorPercent = wmul(ambassadorScore.div(2), ambassadorPercentage);
         uint ambassadorFee = wmul(intro.bid, ambassadorPercent);
         uint platformFee = intro.bid - ambassadorFee;
 

@@ -55,18 +55,18 @@ contract InbotContract is InbotControlled, TokenDestructible, CanReclaimToken, P
     }
 
     function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = (x * y + WAD / 2) / WAD;
+        z = x.mul(y).add(WAD.div(2)).div(WAD);
     }
 
     function rmul(uint x, uint y) internal pure returns (uint z) {
-         z = (x * y + RAY / 2) / RAY;
+        z = x.mul(y).add(RAY.div(2)).div(RAY);
     }
 
     function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = (x * WAD + y / 2) / y;
+        z = x.mul(WAD).add(y.div(2)).div(y);
     }
 
     function rdiv(uint x, uint y) internal pure returns (uint z) {
-        z = (x * RAY + y / 2) / y;
+        z = x.mul(RAY).add(y.div(2)).div(y);
     }
 }

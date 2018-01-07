@@ -17,6 +17,6 @@ interface Score {
 }
 
 interface Share {
-	function distributeTokens(address receiver) public;
-	function distributeTokens(address receiver, uint tokensPerShare) public;
+	function rolloutDividends(address receiver) public;
+	function distributeDividends(address receiver, uint tokensPerShare) public;
 }
