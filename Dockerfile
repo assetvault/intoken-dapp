@@ -7,10 +7,10 @@ WORKDIR /opt/inbot-dapp
 
 RUN apk add -t .gyp --no-cache git python g++ make \
     && npm install -g truffle \
+    && npm install -g ganache-cli \
     && npm install zeppelin-solidity \
     && apk del .gyp
 
 COPY . .
 
-EXPOSE 8080
-ENTRYPOINT []
+CMD ganache-cli & truffle test

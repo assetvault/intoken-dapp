@@ -9,7 +9,7 @@ contract("InScore", function(accounts) {
     score = await InScore.deployed();
   });
 
-  it("should have 50% default IN% in any account when deployed", async() => {
+  it("should have default 50 IN% in any account when deployed", async() => {
     let accountScore = await score.getScore.call(accounts[0]);
     assert.equal(accountScore.valueOf(), full100PercentScore.div(2).valueOf(), "50% IN% was in the account");
   });
@@ -45,17 +45,17 @@ contract("InScore", function(accounts) {
     await score.adminAddRole(accounts[1], "admin");
     await score.scoreUp(accounts[0], {from: accounts[1]});
     let accountScore = await score.getScore.call(accounts[0]);
-    assert.equal(accountScore.valueOf(), full100PercentScore.div(10).mul(6).valueOf(), "60% IN% was in the account");
+    assert.equal(accountScore.valueOf(), full100PercentScore.div(10).mul(6).valueOf(), "60 IN% was in the account");
   });
 
-  it("should not be able to increase IN% account beyond 200%", async() => {
+  it("should not be able to increase IN% account beyond 200 IN%", async() => {
     await score.setScore(accounts[0], full100PercentScore.mul(2).valueOf());
     await score.scoreUp(accounts[0], {from: accounts[1]});
     let accountScore = await score.getScore.call(accounts[0]);
-    assert.equal(accountScore.valueOf(), full100PercentScore.mul(2).valueOf(), "200% IN% was in the account");
+    assert.equal(accountScore.valueOf(), full100PercentScore.mul(2).valueOf(), "200 IN% was in the account");
   });
 
-  it("should fail to decrease IN% account beyond 0%", async() => {
+  it("should fail to decrease IN% account beyond 0 IN%", async() => {
     try {
       await score.setScore(accounts[0], 0);
       let result = await score.scoreDown(accounts[0]);

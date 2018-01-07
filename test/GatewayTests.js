@@ -75,7 +75,7 @@ contract("Gateway", function(accounts) {
     let ambassadorScore = await score.getScore.call(accounts[3]);
     assert.equal(introState.valueOf(), 1, "State.Opened should be saved to intro details");
     assert.equal(intro[6], "admin resolution", "Resolution should be saved to intro details");
-    assert.equal(ambassadorScore.valueOf(), full100PercentScore.mul(0.4).valueOf(), "Default ambassador's IN% should be decreased to 40%");
+    assert.equal(ambassadorScore.valueOf(), full100PercentScore.mul(0.4).valueOf(), "Default ambassador's IN% should be decreased to 40 IN%");
   });
 
   it("admin should be able to resolve any disputed intro NOT being spam and endorse it", async() => {
@@ -90,9 +90,9 @@ contract("Gateway", function(accounts) {
     let vaultBalance = await token.balanceOf.call(accounts[1]);
     assert.equal(introState.valueOf(), 3, "State.Endorsed should be saved to intro details");
     assert.equal(intro[6], "admin resolution", "Resolution should be saved to intro details");
-    assert.equal(ambassadorScore.valueOf(), full100PercentScore.mul(0.6).valueOf(), "Default ambassador's IN% should be increased to 60%");
+    assert.equal(ambassadorScore.valueOf(), full100PercentScore.mul(0.6).valueOf(), "Default ambassador's IN% should be increased to 60 IN%");
     assert.equal(ambassadorBalance.valueOf(), oneToken.mul(0.175).valueOf(), "Ambassador receives 17.5% of the bid value if his IN% is 50%");
-    assert.equal(vaultBalance.valueOf(), oneToken.mul(0.825).valueOf(), "Inbot platform receives 82.5% of the bid value if ambassador's IN% is 50%");
+    assert.equal(vaultBalance.valueOf(), oneToken.mul(0.825).valueOf(), "Inbot platform receives 82.5% of the bid value if ambassador's IN% is 50 IN%");
     assert.equal(ambassadorShares.valueOf(), oneToken.valueOf(), "Ambassador should receive 1 INS as a result of endorsement");
   });
 

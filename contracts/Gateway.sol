@@ -91,23 +91,47 @@ contract InbotMediatorGateway is Gateway, InbotMediatorGatewayEvents, InbotContr
         platformFeeVault = _platformFeeVault;
     }
     
+    /**
+    * @dev Sets a percentage of any bid which an ambassador with 200IN% can get.
+    * @param _percentage  The percentage which get an ambassador with 200IN%.
+    */
     function setAmbassadorPercentage(uint _percentage) public onlyAdmin {
         require(_percentage > 0 && _percentage < 100);
         ambassadorPercentage = WAD.div(100).mul(_percentage); 
     }
 
+    /**
+    * @dev ERC223 compliant fallback to receive tokens to this contract's address.
+    */
     function tokenFallback(address _from, uint _value, bytes _data) public {
         TokenReceived(_from, _value, _data);
     }
 
+    /**
+    * @dev Gets a state of an intro by _introId.
+    * @param _introId  Intro's ID.
+    * @return Intro's state.
+    */
     function getIntroState(uint _introId) public view returns (State) {
         return intros[_introId].state;
     }
 
+    /**
+    * @dev Gets a bid of an intro by _introId.
+    * @param _introId  Intro's ID.
+    * @return Intro's bid value.
+    */
     function getIntroBid(uint _introId) public view returns (uint) {
         return intros[_introId].bid;
     }
 
+    /**
+    * @dev Open an intro and deposit a bid to this contract's address.
+    * @param _introId       Intro's ID.
+    * @param _bid           Intro's bid value.
+    * @param _creationTime  Intro's external creation time or '0' for now.
+    * @param _hashedInfo    Intro's external info which is hashed for obfuscation.
+    */
     function open(
         uint _introId, 
         uint _bid, 
@@ -139,6 +163,12 @@ contract InbotMediatorGateway is Gateway, InbotMediatorGatewayEvents, InbotContr
         Opened(_introId, msg.sender, validTime);
     }
 
+    /**
+    * @dev Accept an intro and save the ambassador's address.
+    * @param _introId     Intro's ID.
+    * @param _ambassador  Intro's accepted ambassador address.
+    * @param _updateTime  Intro's external update time or '0' for now.
+    */
     function accept(
         uint _introId, 
         address _ambassador,
@@ -155,6 +185,12 @@ contract InbotMediatorGateway is Gateway, InbotMediatorGatewayEvents, InbotContr
         Accepted(_introId, msg.sender, getTime(_updateTime));
     }
 
+    /**
+    * @dev Endorse an intro and charge platform and ambassador fees,
+    *      allocate InShare to the ambassador and increase his/her IN%.
+    * @param _introId     Intro's ID.
+    * @param _updateTime  Intro's external update time or '0' for now.
+    */
     function endorse(
         uint _introId, 
         uint _updateTime
@@ -185,6 +221,11 @@ contract InbotMediatorGateway is Gateway, InbotMediatorGatewayEvents, InbotContr
         Endorsed(_introId, msg.sender, getTime(_updateTime));
     }
 
+    /**
+    * @dev Dispute an intro (performed off-blockchain) as being spammy.
+    * @param _introId     Intro's ID.
+    * @param _updateTime  Intro's external update time or '0' for now.
+    */
     function dispute(
         uint _introId, 
         uint _updateTime
@@ -197,6 +238,11 @@ contract InbotMediatorGateway is Gateway, InbotMediatorGatewayEvents, InbotContr
         Disputed(_introId, msg.sender, getTime(_updateTime));
     }
 
+    /**
+    * @dev Withdraw from an intro and possibly return a bid.
+    * @param _introId     Intro's ID.
+    * @param _updateTime  Intro's external update time or '0' for now.
+    */
     function withdraw(
         uint _introId, 
         uint _updateTime
@@ -219,6 +265,13 @@ contract InbotMediatorGateway is Gateway, InbotMediatorGatewayEvents, InbotContr
         }
     }
 
+    /**
+    * @dev Resolve an intro by investigating off-blockchain and then executing transaction.
+    * @param _introId     Intro's ID.
+    * @param _updateTime  Intro's external update time or '0' for now.
+    * @param _resolution  Intro's resolution (might be hashed for obfuscation).
+    * @param _isSpam      A boolean that indicates intro is a spam or not.
+    */
     function resolve(
         uint _introId, 
         uint _updateTime,
