@@ -13,4 +13,4 @@ RUN apk add -t .gyp --no-cache git python g++ make \
 
 COPY . .
 
-CMD ganache-cli & truffle test
+CMD ganache-cli --mem & truffle test
