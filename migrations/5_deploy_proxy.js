@@ -1,8 +1,8 @@
 const InToken = artifacts.require("InToken");
 const InShare = artifacts.require("InShare");
 const InScore = artifacts.require("InScore");
+const Gateway = artifacts.require("InbotMediatorGateway");
 const InbotProxy = artifacts.require("InbotProxy");
-const InbotMediatorGateway = artifacts.require("InbotMediatorGateway");
 
 module.exports = function(deployer) {
   deployer.deploy(
@@ -10,11 +10,11 @@ module.exports = function(deployer) {
   	InToken.address, 
   	InShare.address, 
   	InScore.address,
-  	InbotMediatorGateway.address
+  	Gateway.address
   ).then(function() {
   	InToken.at(InToken.address).setProxy(InbotProxy.address);
   	InShare.at(InShare.address).setProxy(InbotProxy.address);
   	InScore.at(InScore.address).setProxy(InbotProxy.address);
-  	InbotMediatorGateway.at(InbotMediatorGateway.address).setProxy(InbotProxy.address);
+  	Gateway.at(Gateway.address).setProxy(InbotProxy.address);
   });
 };

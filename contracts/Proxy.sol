@@ -9,19 +9,19 @@ contract InbotProxy is RBAC, Pausable {
 	MintableToken	token;
 	MintableToken	share;
 	Score 			score;
-	Mediator 		mediator;
+	Gateway 		gateway;
 
 	function InbotProxy(
 		address _token, 
 		address _share, 
 		address _score, 
-		address _mediator
+		address _gateway
 	) public 
 	{
 		token = MintableToken(_token);
 		share = MintableToken(_share);
 		score = Score(_score);
-		mediator = Mediator(_mediator);
+		gateway = Gateway(_gateway);
 	}
 
 	function setToken(address _token) public onlyAdmin {
@@ -48,11 +48,11 @@ contract InbotProxy is RBAC, Pausable {
 		return score;
 	}
 
-	function setMediator(address _mediator) public onlyAdmin {
-		mediator = Mediator(_mediator);
+	function setGateway(address _gateway) public onlyAdmin {
+		gateway = Gateway(_gateway);
 	}
 
-	function getMediator() whenNotPaused public view returns (Mediator) {
-		return mediator;
+	function getgateway() whenNotPaused public view returns (Gateway) {
+		return gateway;
 	}
 }

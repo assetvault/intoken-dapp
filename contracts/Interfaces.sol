@@ -1,6 +1,6 @@
 pragma solidity ^0.4.17;
 
-interface Mediator {
+interface Gateway {
 	function open(uint _introId, uint _bid, uint _creationTime, string _hashedInfo) public;
 	function accept(uint _introId, address _ambassador, uint _updateTime) public;
 	function endorse(uint _introId, uint _updateTime) public;

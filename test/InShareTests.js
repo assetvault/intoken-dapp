@@ -67,9 +67,9 @@ contract("InShare", function(accounts) {
   });
 
   it("should be able to distribute 1xIN% INT tokens from one InShare (INS) and put them in the receiving account", async() => {
-    let premint1 = await token.mint(accounts[0], BigNumber("5e+27").valueOf());
-    let approval = await token.approve(InShare.address, oneToken.div(2).valueOf());
-    let premint2 = await share.mint(accounts[1], oneToken.valueOf());
+    await token.mint(accounts[0], BigNumber("5e+27").valueOf());
+    await token.approve(InShare.address, oneToken.div(2).valueOf());
+    await share.mint(accounts[1], oneToken.valueOf());
     let result = await share.distributeDividends(accounts[1], 1);
     let event = result.logs[2].args;
     assert.equal(event.receiver, accounts[1]);
@@ -80,7 +80,7 @@ contract("InShare", function(accounts) {
   });
 
   it("should be able to rollout 10xIN% INT tokens from one InShare (INS) and put them in the receiving account", async() => {
-    let premint = await share.mint(accounts[2], oneToken.valueOf());
+    await share.mint(accounts[2], oneToken.valueOf());
     let result = await share.rolloutDividends(accounts[2]);
     let event = result.logs[2].args;
     assert.equal(event.receiver, accounts[2]);

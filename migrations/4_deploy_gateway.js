@@ -1,5 +1,5 @@
-const InbotMediatorGateway = artifacts.require("InbotMediatorGateway");
+const Gateway = artifacts.require("InbotMediatorGateway");
 
 module.exports = function(deployer, network, accounts) {
-  deployer.deploy(InbotMediatorGateway, accounts[1]);
+  deployer.deploy(Gateway, accounts[1]);
 };

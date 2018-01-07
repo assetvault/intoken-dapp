@@ -3,6 +3,7 @@ pragma solidity ^0.4.17;
 import "./Interfaces.sol";
 import "./Proxy.sol";
 import "./Inbot.sol";
+import "./Token.sol";
 
 contract InbotMediatorGatewayEvents {
     event Opened(uint indexed id, address indexed actor, uint indexed time);
@@ -13,7 +14,7 @@ contract InbotMediatorGatewayEvents {
     event Resolved(uint indexed id, address indexed actor, uint indexed time);
 } 
 
-contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotContract {
+contract InbotMediatorGateway is Gateway, InbotMediatorGatewayEvents, InbotContract, ERC223ReceivingContract {
 
     enum State {Null, Open, Accepted, Endorsed, Disputed, Withdrawn}
 
@@ -43,11 +44,24 @@ contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotCont
     }
 
     /**
+     *  Asserts current state being _state1 OR _state2.
+     *  @param _state1 Expected first state
+     *  @param _state2 Expected second state
+     *  @param _introId Intro Id
+     */
+    modifier atStates(uint _introId, State _state1, State _state2) {
+        require(_state1 == intros[_introId].state
+             || _state2 == intros[_introId].state);
+        _;
+    }
+
+    /**
      *  Asserts vendor's identity.
      *  @param _introId Intro Id
      */
     modifier isVendor(uint _introId) {
-        require(intros[_introId].vendor == msg.sender);
+        require(intros[_introId].vendor == msg.sender 
+             || hasRole(msg.sender, ROLE_ADMIN));
         _;
     }
 
@@ -57,7 +71,8 @@ contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotCont
      */
     modifier isIntroParty(uint _introId) {
         require(intros[_introId].ambassador == msg.sender
-             || intros[_introId].vendor == msg.sender);
+             || intros[_introId].vendor == msg.sender
+             || hasRole(msg.sender, ROLE_ADMIN));
         _;
     }
 
@@ -79,6 +94,18 @@ contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotCont
     function setAmbassadorPercentage(uint _percentage) public onlyAdmin {
         require(_percentage > 0 && _percentage < 100);
         ambassadorPercentage = WAD.div(100).mul(_percentage); 
+    }
+
+    function tokenFallback(address _from, uint _value, bytes _data) public {
+        TokenReceived(_from, _value, _data);
+    }
+
+    function getIntroState(uint _introId) public view returns (State) {
+        return intros[_introId].state;
+    }
+
+    function getIntroBid(uint _introId) public view returns (uint) {
+        return intros[_introId].bid;
     }
 
     function open(
@@ -136,7 +163,7 @@ contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotCont
         proxyExists
         whenNotPaused 
         isVendor(_introId)
-        atState(_introId, State.Accepted)
+        atStates(_introId, State.Accepted, State.Disputed)
         transition(_introId, State.Endorsed)
     {
         Intro storage intro = intros[_introId];
@@ -176,11 +203,11 @@ contract InbotMediatorGateway is Mediator, InbotMediatorGatewayEvents, InbotCont
     )
         public
         proxyExists
-        whenNotPaused 
+        whenNotPaused
+        atStates(_introId, State.Open, State.Accepted)
         isIntroParty(_introId)
     {
         Intro storage intro = intros[_introId];
-        require(State.Open == intro.state || State.Accepted == intro.state);
 
         if (intro.vendor == msg.sender) {
             intro.state = State.Withdrawn;

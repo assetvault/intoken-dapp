@@ -10,7 +10,8 @@ import "./Inbot.sol";
  /**
  * @title Contract that will work with ERC223 tokens.
  */
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
+	event TokenReceived(address indexed from, uint value, bytes data);
 	/**
 	 * @dev Standard ERC223 function that will handle incoming token transfers.
 	 *
