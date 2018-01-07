@@ -3,7 +3,6 @@ pragma solidity ^0.4.17;
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/ownership/rbac/RBAC.sol";
 import "zeppelin-solidity/contracts/token/MintableToken.sol";
-import "zeppelin-solidity/contracts/token/MintableToken.sol";
 import "./Interfaces.sol";
 
 contract InbotProxy is RBAC, Pausable {
