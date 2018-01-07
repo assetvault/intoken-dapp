@@ -39,7 +39,10 @@ contract InScore is Score, InbotContract {
 	}
 
 	function scoreDown(address _user) public onlyAdmin whenNotPaused returns (bool) {
-		setScore(_user, max(0, getScore(_user).sub(scoreIncrement)));
+		uint score = getScore(_user);
+
+		require(score > 0);
+		setScore(_user, score.sub(scoreIncrement));
 
 		return true;
 	}
