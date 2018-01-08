@@ -35,11 +35,13 @@ contract InbotContract is InbotControlled, TokenDestructible, CanReclaimToken, P
     }
 
     function pause() public onlyAdmin whenNotPaused {
-        super.pause();
+        paused = true;
+        Pause();
     }
 
     function unpause() public onlyAdmin whenPaused {
-        super.unpause();
+        paused = false;
+        Unpause();
     }
 
     function getTime(uint _time) internal view returns (uint t) {

@@ -18,7 +18,7 @@ Public repository for source code of the `InToken` \& `InShare` [ERC-20](https:/
 
 - `Inbot Mediator Gateway` automates the processes of opening an intro bid, contracting the ambassador, mediating the result, and in case of successful delivery, automatically transferring the rewards to the ambassador's token address.
 
-## Useful Information
+## Useful information
 
 Read more: [Whitepaper](https://docs.google.com/document/d/12siRqjuHIHelPS-NaVVZxnq4AJ1hGlDXoGo6DeVw51U/edit?usp=sharing)
 
