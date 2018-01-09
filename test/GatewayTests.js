@@ -91,8 +91,8 @@ contract("Gateway", function(accounts) {
     assert.equal(introState.valueOf(), 3, "State.Endorsed should be saved to intro details");
     assert.equal(intro[6], "admin resolution", "Resolution should be saved to intro details");
     assert.equal(ambassadorScore.valueOf(), full100PercentScore.mul(0.6).valueOf(), "Default ambassador's IN% should be increased to 60 IN%");
-    assert.equal(ambassadorBalance.valueOf(), oneToken.mul(0.175).valueOf(), "Ambassador receives 17.5% of the bid value if his IN% is 50%");
-    assert.equal(vaultBalance.valueOf(), oneToken.mul(0.825).valueOf(), "Inbot platform receives 82.5% of the bid value if ambassador's IN% is 50 IN%");
+    assert.equal(ambassadorBalance.valueOf(), oneToken.mul(0.175).valueOf(), "Ambassador receives 17.5% of the bid value if he/she has 50 IN%");
+    assert.equal(vaultBalance.valueOf(), oneToken.mul(0.825).valueOf(), "Inbot platform receives 82.5% of the bid value if ambassador has 50 IN%");
     assert.equal(ambassadorShares.valueOf(), oneToken.valueOf(), "Ambassador should receive 1 INS as a result of endorsement");
   });
 
@@ -126,6 +126,24 @@ contract("Gateway", function(accounts) {
     let introState = await gateway.getIntroState.call(INTRO_ID4);
     assert.equal(introState.valueOf(), 1, "State.Opened should be saved to intro details");
     assert.equal(balance.valueOf(), oneToken.mul(8).valueOf(), "8 INT should remain in the account_2");
+  });
+
+  it("admin should be able to endorse intro and allocate INS/INT for ambassador with 200IN%", async() => {
+    await token.approve(Gateway.address, oneToken.valueOf(), {from: accounts[2]});
+    await score.setScore(accounts[5], full100PercentScore.mul(2).valueOf())
+    await gateway.open(INTRO_ID5, oneToken.valueOf(), 0, "", {from: accounts[2]});
+    await gateway.accept(INTRO_ID5, accounts[5], 0, {from: accounts[2]});
+    await gateway.endorse(INTRO_ID5, 0, {from: accounts[2]});
+    let introState = await gateway.getIntroState.call(INTRO_ID1);
+    let ambassadorScore = await score.getScore.call(accounts[5]);
+    let ambassadorBalance = await token.balanceOf.call(accounts[5]);
+    let ambassadorShares = await share.balanceOf.call(accounts[5]);
+    let vaultBalance = await token.balanceOf.call(accounts[1]);
+    assert.equal(introState.valueOf(), 3, "State.Endorsed should be saved to intro details");
+    assert.equal(ambassadorScore.valueOf(), full100PercentScore.mul(2).valueOf(), "Default ambassador's IN% should be increased to 60 IN%");
+    assert.equal(ambassadorBalance.valueOf(), oneToken.mul(0.7).valueOf(), "Ambassador receives 70% of the bid value if he/she has 200 IN%");
+    assert.equal(vaultBalance.valueOf(), oneToken.mul(1.125).valueOf(), "Inbot platform receives 30% of the bid value if ambassador has 200 IN%");
+    assert.equal(ambassadorShares.valueOf(), oneToken.valueOf(), "Ambassador should receive 1 INS as a result of endorsement");
   });
 
 });

@@ -30,7 +30,7 @@ contract InbotContract is InbotControlled, TokenDestructible, CanReclaimToken, P
         proxy = InbotProxy(_proxy);
     }
 
-    function reclaimToken() public proxyExists onlyAdmin {
+    function reclaimToken() public proxyExists onlyOwner {
         this.reclaimToken(proxy.getToken());
     }
 

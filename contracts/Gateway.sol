@@ -87,7 +87,7 @@ contract InbotMediatorGateway is Gateway, InbotMediatorGatewayEvents, InbotContr
     }
 
     function InbotMediatorGateway(address _platformFeeVault) public {
-        ambassadorPercentage = WAD.div(100).mul(70);
+        ambassadorPercentage = WAD.div(100).mul(70); // default 70%
         platformFeeVault = _platformFeeVault;
     }
     

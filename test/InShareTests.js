@@ -50,7 +50,7 @@ contract("InShare", function(accounts) {
 
   it("should fail to distribute INT token dividends to receiving account with 0 INS", async() => {
     try {
-      let result = await share.distributeDividends(accounts[2], 1);
+      let result = await share.distributeDividends(accounts[3], 1);
       throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
     } catch (error) {
       assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
@@ -59,7 +59,8 @@ contract("InShare", function(accounts) {
 
   it("should fail to distribute zero INT token dividends to receiving account", async() => {
     try {
-      let result = await share.distributeDividends(accounts[2], 0);
+      await share.mint(accounts[3], oneToken.valueOf());
+      let result = await share.distributeDividends(accounts[4], 0);
       throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
     } catch (error) {
       assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
