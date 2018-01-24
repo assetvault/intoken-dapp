@@ -4,8 +4,8 @@ import "./Token.sol";
 /** 
  * @title InToken (Inbot Token) contract. 
 */
-contract InToken is InbotToken("InToken", "INT", 18) {
-	uint public constant MAX_SUPPLY = 10*RAY;
+contract InToken is InbotToken("InToken", "IN", 18) {
+	uint public constant MAX_SUPPLY = 13*RAY;
 
 	function InToken() public {
 	}
