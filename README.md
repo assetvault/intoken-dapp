@@ -1,6 +1,6 @@
 <p align="center">
   <a href="http://intoken.org">
-    <img src="https://docs.google.com/drawings/d/e/2PACX-1vSbArtseL0OtUZ6A8fl9hXD4qcm5JepJyUNi_xQiVpKO_e8osB1086JjUeu57R7mj6rPJRU-HuFOCr4/pub?w=421&h=384" alt="InToken" height="100px"/>
+    <img src="intoken.jpg" alt="InToken" height="100px"/>
   </a>
 </p>
 
@@ -42,6 +42,11 @@ Contract stores trust scores of ambassadors and vendors. Allows to increase or d
 *  **Inbot Mediator Gateway**
 
 Serves and operates intro workflows. Contains transparently our business logics of rewarding ambassadors (and discouraging dishonest actors) for making introductions in terms of INT tokens and INS crypto-securities. 
+
+## Contract Addresses
+* **InToken** on [Rinkeby](https://www.rinkeby.io): [0xa6040e2e01514445143289b059e29bd5004e51ca](https://rinkeby.etherscan.io/address/0xa6040e2e01514445143289b059e29bd5004e51ca)
+
+* **InToken** on [Mainnet](https://ethstats.net): [0x0dd1c99ac9bc48a1d482878ecc8b9760aa1e8de2](https://etherscan.io/address/0x0dd1c99ac9bc48a1d482878ecc8b9760aa1e8de2)
 
 ## Prerequisites
 
