@@ -44,9 +44,13 @@ Contract stores trust scores of ambassadors and vendors. Allows to increase or d
 Serves and operates intro workflows. Contains transparently our business logics of rewarding ambassadors (and discouraging dishonest actors) for making introductions in terms of INT tokens and INS crypto-securities. 
 
 ## Contract Addresses
-* **InToken** on [Rinkeby](https://www.rinkeby.io): [0xa6040e2e01514445143289b059e29bd5004e51ca](https://rinkeby.etherscan.io/address/0xa6040e2e01514445143289b059e29bd5004e51ca)
 
 * **InToken** on [Mainnet](https://ethstats.net): [0x0dd1c99ac9bc48a1d482878ecc8b9760aa1e8de2](https://etherscan.io/address/0x0dd1c99ac9bc48a1d482878ecc8b9760aa1e8de2)
+
+* **InToken** on [Rinkeby](https://www.rinkeby.io): [0xa6040e2e01514445143289b059e29bd5004e51ca](https://rinkeby.etherscan.io/address/0xa6040e2e01514445143289b059e29bd5004e51ca)
+
+* **InToken** on [Kovan](https://www.rinkeby.io): [0xC412e9862046AC5f8643eE6b33E89444535e8eB6](https://kovan.etherscan.io/address/0xC412e9862046AC5f8643eE6b33E89444535e8eB6)
+
 
 ## Prerequisites
 
