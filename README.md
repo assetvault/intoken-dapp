@@ -29,11 +29,11 @@ Software license: [MIT License](LICENSE)
 ## Main contracts
 *  **InToken**
 
-Serves as the main governing smart contaract for INT tokens. Allows to transfer, mint and burn `InTokens`. 
+Serves as the main governing smart contaract for IN tokens. Allows to transfer, mint and burn `InTokens`. 
 
 *  **InShare**
 
-Serves as the main governing smart contaract for INS crypto-security. Designed to distribute and rollout dividents in terms of INT tokens to a community. Allows to transfer, mint and burn `InShares` but transfers are disabled at the deployment.  
+Serves as the main governing smart contaract for INS crypto-security. Designed to distribute and rollout dividents in terms of IN tokens to a community. Allows to transfer, mint and burn `InShares` but transfers are disabled at the deployment.  
 
 *  **InScore (IN\%)**
 
@@ -41,7 +41,7 @@ Contract stores trust scores of ambassadors and vendors. Allows to increase or d
 
 *  **Inbot Mediator Gateway**
 
-Serves and operates intro workflows. Contains transparently our business logics of rewarding ambassadors (and discouraging dishonest actors) for making introductions in terms of INT tokens and INS crypto-securities. 
+Serves and operates intro workflows. Contains transparently our business logics of rewarding ambassadors (and discouraging dishonest actors) for making introductions in terms of IN tokens and INS crypto-securities. 
 
 ## Contract Addresses
 
